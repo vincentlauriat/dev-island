@@ -60,7 +60,7 @@ grep -q 'if: false'                   .github/workflows/release.yml       || ech
 grep -q 'DEV_ISLAND_EDDSA_PUBLIC_KEY' .github/workflows/release.yml       || echo 'MISSING: Sparkle public key wiring + guard'
 grep -q 'rebrand.sh --check'          .github/workflows/ci.yml            || echo 'MISSING: rebrand guard step'
 grep -q '0xED/255.0'                  scripts/generate-v6-appicon.swift   || echo 'MISSING: fork icon palette'
-grep -q 'def render_app_icon'         scripts/generate_brand_icons.py     && echo 'REVERTED: dead render_app_icon() is back'
+grep -q 'app icon is NOT rendered here' scripts/generate_brand_icons.py   || echo 'MISSING: dead render_app_icon() came back'
 git diff HEAD -- scripts/package-app.sh .github/workflows/release.yml .github/workflows/ci.yml \
                  scripts/generate-v6-appicon.swift scripts/generate_brand_icons.py
 
