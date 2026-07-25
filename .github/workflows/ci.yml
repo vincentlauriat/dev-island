@@ -19,6 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Fork-specific guard. The rebrand is regenerated, never hand-resolved, so a sync that
+      # forgets to re-run scripts/rebrand.sh must fail loudly rather than ship a half-renamed
+      # tree. See docs/fork-sync.md. Runs first: it is instant and the failure is unambiguous.
+      - name: Verify rebrand is fully applied
+        run: bash scripts/rebrand.sh --check
+
       - name: Show Swift Version
         run: swift --version
 

@@ -23,6 +23,7 @@ judgement on a sync:**
 | `appcast.xml` | Reset to an empty feed, not rebranded |
 | `scripts/package-app.sh` | Sparkle keys emitted conditionally instead of hardcoded |
 | `.github/workflows/release.yml` | Homebrew tap step disabled |
+| `.github/workflows/ci.yml` | Extra `rebrand.sh --check` guard step |
 | `scripts/rebrand.sh`, `docs/fork-sync.md` | They *are* the rebrand |
 
 ## Syncing
@@ -44,8 +45,9 @@ git commit -am "chore: merge upstream vX.Y.Z and regenerate rebrand"
 ```
 
 `bash scripts/rebrand.sh --check` is a dry run: it reports what would change and exits non-zero if
-anything still carries upstream branding. Useful as a CI guard, and as the last thing to run before
-committing a sync.
+anything still carries upstream branding. **It runs as the first step of the `harness` job in
+`.github/workflows/ci.yml`**, so a sync that forgets to regenerate the rebrand fails loudly instead
+of shipping a half-renamed tree. Run it locally before committing a sync too.
 
 > **Do not** try to keep the rebrand as a separate commit and drop it with
 > `git rebase --onto upstream/main <rebrand> main`. Anything the fork changed *before* that commit
