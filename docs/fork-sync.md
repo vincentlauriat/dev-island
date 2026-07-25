@@ -17,33 +17,62 @@ That leaves a short, enumerable list of files the script cannot regenerate becau
 fork-specific decisions rather than a mechanical rename. **These are the only files that need human
 judgement on a sync:**
 
-| File | Why it is hand-maintained |
-|---|---|
-| `README.md`, `README.zh-CN.md` | Fork attribution, no Homebrew cask, no fork-owned community channels |
-| `appcast.xml` | Reset to an empty feed, not rebranded |
-| `scripts/package-app.sh` | Sparkle keys emitted conditionally instead of hardcoded |
-| `.github/workflows/release.yml` | Homebrew tap step disabled |
-| `.github/workflows/ci.yml` | Extra `rebrand.sh --check` guard step |
-| `scripts/generate-v6-appicon.swift`, `Assets/Brand/**` | Fork icon palette + the regenerated binaries |
-| `scripts/rebrand.sh`, `docs/fork-sync.md` | They *are* the rebrand |
+| File | Bucket | Why it is hand-maintained |
+|---|---|---|
+| `README.md`, `README.zh-CN.md` | restore | Fork attribution, no Homebrew cask, no fork-owned community channels |
+| `appcast.xml` | restore | Reset to an empty feed, not rebranded |
+| `scripts/package-app.sh` | re-apply | Sparkle keys emitted conditionally instead of hardcoded |
+| `.github/workflows/release.yml` | re-apply | Homebrew tap step disabled |
+| `.github/workflows/ci.yml` | re-apply | Extra `rebrand.sh --check` guard step |
+| `scripts/generate-v6-appicon.swift` | re-apply | Fork icon palette — violet pair, upstream's geometry |
+| `Assets/Brand/**` | regenerate | Binaries derived from the renderer above |
+| `scripts/rebrand.sh`, `docs/fork-sync.md` | untouched | They *are* the rebrand, and upstream does not have them — the merge leaves them alone |
+
+The three buckets need different handling, and the sync commands below follow them:
+
+- **restore** — upstream's version is meaningless here. Take the fork's wholesale.
+- **re-apply** — upstream's changes matter and the fork's edit is surgical. Read the diff, keep
+  upstream's merged version, put the fork's edit back by hand.
+- **regenerate** — do *not* restore these. Re-run the generators. Restoring would bring back
+  `DevIsland.icns` while the merged tree still carries upstream's `OpenIsland.icns`, leaving both
+  until `rebrand.sh` untangles it; regenerating sidesteps that entirely.
 
 ## Syncing
 
 ```bash
 git fetch upstream
-git merge -X theirs upstream/main    # rename conflicts resolve in upstream's favour
 
-# Regenerate the rename over the merged tree.
+# --no-commit keeps HEAD on the pre-merge commit, so `git checkout HEAD -- <file>` below
+# really does restore the fork's version. Without it the merge auto-commits and those
+# restores become silent no-ops.
+git merge --no-commit -X theirs upstream/main    # rename conflicts resolve in upstream's favour
+
+# 1. Regenerate the rename over the merged tree.
 bash scripts/rebrand.sh
 
-# `-X theirs` will have reverted the hand-maintained files above to upstream's version.
-# Restore them, and re-apply the fork's edits to any that upstream actually changed:
+# 2. restore — take the fork's version wholesale.
 git checkout HEAD -- README.md README.zh-CN.md appcast.xml
-git diff upstream/main -- scripts/package-app.sh .github/workflows/release.yml
 
-swift build && swift test
-git commit -am "chore: merge upstream vX.Y.Z and regenerate rebrand"
+# 3. re-apply — read each diff, then put the fork's edit back by hand.
+#    package-app.sh: Sparkle keys conditional on DEV_ISLAND_EDDSA_PUBLIC_KEY
+#    release.yml:    Homebrew tap step `if: false`
+#    ci.yml:         `rebrand.sh --check` as first step of the harness job
+#    generate-v6-appicon.swift: paper #EDE9FE / ink #2E1065
+git diff HEAD -- scripts/package-app.sh .github/workflows/release.yml \
+                 .github/workflows/ci.yml scripts/generate-v6-appicon.swift
+
+# 4. regenerate — after the renderer's palette is back in place.
+swift scripts/generate-v6-appicon.swift
+python3 scripts/generate_brand_icons.py
+
+bash scripts/rebrand.sh --check && swift build && swift test
+git add -A && git commit -m "chore: merge upstream vX.Y.Z and regenerate rebrand"
 ```
+
+Step 4 needs Pillow, which nothing in the repo declares: `python3 -m venv .venv && .venv/bin/pip
+install Pillow`, then run the pipeline with `.venv/bin/python`. Skip step 4 entirely if the merge
+left `scripts/generate-v6-appicon.swift` untouched — the icon binaries are byte-stable, so
+regenerating them would produce no diff anyway.
 
 `bash scripts/rebrand.sh --check` is a dry run: it reports what would change and exits non-zero if
 anything still carries upstream branding. **It runs as the first step of the `harness` job in
