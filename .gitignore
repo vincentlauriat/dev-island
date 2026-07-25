@@ -17,6 +17,7 @@ Packages/
 Package.resolved
 
 # Local tooling artifacts
+.venv/
 .claude/
 .playwright-mcp/
 output/

@@ -53,26 +53,32 @@ bash scripts/rebrand.sh
 # 2. restore — take the fork's version wholesale.
 git checkout HEAD -- README.md README.zh-CN.md appcast.xml
 
-# 3. re-apply — read each diff, then put the fork's edit back by hand.
-#    package-app.sh: Sparkle keys conditional on DEV_ISLAND_EDDSA_PUBLIC_KEY
-#    release.yml:    Homebrew tap step `if: false`
-#    ci.yml:         `rebrand.sh --check` as first step of the harness job
-#    generate-v6-appicon.swift: paper #EDE9FE / ink #2E1065
+# 3. re-apply — check each fork edit survived the merge, re-apply only what is missing.
+grep -q 'DEV_ISLAND_EDDSA_PUBLIC_KEY' scripts/package-app.sh              || echo 'MISSING: conditional Sparkle keys'
+grep -q 'if: false'                   .github/workflows/release.yml       || echo 'MISSING: Homebrew tap disabled'
+grep -q 'rebrand.sh --check'          .github/workflows/ci.yml            || echo 'MISSING: rebrand guard step'
+grep -q '0xED/255.0'                  scripts/generate-v6-appicon.swift   || echo 'MISSING: fork icon palette'
 git diff HEAD -- scripts/package-app.sh .github/workflows/release.yml \
                  .github/workflows/ci.yml scripts/generate-v6-appicon.swift
 
 # 4. regenerate — after the renderer's palette is back in place.
 swift scripts/generate-v6-appicon.swift
-python3 scripts/generate_brand_icons.py
+.venv/bin/python scripts/generate_brand_icons.py   # needs Pillow — see below
 
 bash scripts/rebrand.sh --check && swift build && swift test
 git add -A && git commit -m "chore: merge upstream vX.Y.Z and regenerate rebrand"
 ```
 
 Step 4 needs Pillow, which nothing in the repo declares: `python3 -m venv .venv && .venv/bin/pip
-install Pillow`, then run the pipeline with `.venv/bin/python`. Skip step 4 entirely if the merge
-left `scripts/generate-v6-appicon.swift` untouched — the icon binaries are byte-stable, so
-regenerating them would produce no diff anyway.
+install Pillow`, then run the pipeline with `.venv/bin/python`. `.venv/` is gitignored, so the
+`git add -A` at the end of the block will not swallow it. Skip step 4 entirely if the merge left
+`scripts/generate-v6-appicon.swift` untouched — both generators are byte-stable, so regenerating
+produces no diff anyway.
+
+Step 3 flags only what the merge actually dropped. `-X theirs` resolves *conflicting* hunks, not
+whole files: an upstream change to a different part of `ci.yml` three-way-merges cleanly and leaves
+the guard step in place, with nothing to re-apply. The `git diff HEAD` is there to read what
+upstream changed, not because the fork's edits are presumed lost.
 
 `bash scripts/rebrand.sh --check` is a dry run: it reports what would change and exits non-zero if
 anything still carries upstream branding. **It runs as the first step of the `harness` job in
