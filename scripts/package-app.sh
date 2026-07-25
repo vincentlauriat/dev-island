@@ -17,7 +17,11 @@ bundle_dir="${DEV_ISLAND_BUNDLE_DIR:-$package_root/$app_name.app}"
 zip_path="${DEV_ISLAND_ZIP_PATH:-$package_root/$app_name.zip}"
 dmg_path="${DEV_ISLAND_DMG_PATH:-$package_root/$app_name.dmg}"
 signing_identity="${DEV_ISLAND_SIGN_IDENTITY:-}"
-notary_profile="${DEV_ISLAND_NOTARY_PROFILE:-}"
+# One notarytool profile is shared across every macOS project on this machine: notarytool
+# credentials are tied to the Apple ID + team, not to the app, so there is no per-project profile.
+# Notarization only fires when a signing identity is also set, so this default is inert for
+# unsigned builds. CI passes an empty value — a runner has no access to the login keychain.
+notary_profile="${DEV_ISLAND_NOTARY_PROFILE-AppliMacVincentGithub}"
 
 brand_script="$repo_root/scripts/generate_brand_icons.py"
 dmg_bg_script="$repo_root/scripts/generate_dmg_background.py"

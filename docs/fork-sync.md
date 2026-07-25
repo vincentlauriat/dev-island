@@ -21,7 +21,7 @@ judgement on a sync:**
 |---|---|---|
 | `README.md`, `README.zh-CN.md` | restore | Fork attribution, no Homebrew cask, no fork-owned community channels |
 | `appcast.xml` | restore | Reset to an empty feed, not rebranded |
-| `scripts/package-app.sh` | re-apply | Sparkle keys emitted conditionally instead of hardcoded |
+| `scripts/package-app.sh` | re-apply | Sparkle keys emitted conditionally instead of hardcoded; `AppliMacVincentGithub` as the default notary profile |
 | `.github/workflows/release.yml` | re-apply | Homebrew tap step disabled; Sparkle public key passed from a repo variable + the key-pair consistency guard |
 | `scripts/generate_brand_icons.py` | re-apply | Dead `render_app_icon()` removed — upstream still has it |
 | `.github/workflows/ci.yml` | re-apply | Extra `rebrand.sh --check` guard step |
@@ -56,6 +56,8 @@ git checkout HEAD -- README.md README.zh-CN.md appcast.xml
 
 # 3. re-apply — check each fork edit survived the merge, re-apply only what is missing.
 grep -q 'DEV_ISLAND_EDDSA_PUBLIC_KEY' scripts/package-app.sh              || echo 'MISSING: conditional Sparkle keys'
+grep -q 'AppliMacVincentGithub'       scripts/package-app.sh              || echo 'MISSING: default notary profile'
+grep -q 'DEV_ISLAND_NOTARY_PROFILE'   .github/workflows/release.yml       || echo 'MISSING: CI neutralisation of the notary profile'
 grep -q 'if: false'                   .github/workflows/release.yml       || echo 'MISSING: Homebrew tap disabled'
 grep -q 'DEV_ISLAND_EDDSA_PUBLIC_KEY' .github/workflows/release.yml       || echo 'MISSING: Sparkle public key wiring + guard'
 grep -q 'rebrand.sh --check'          .github/workflows/ci.yml            || echo 'MISSING: rebrand guard step'

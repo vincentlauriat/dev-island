@@ -65,6 +65,10 @@ jobs:
             echo "Skipping notarytool credential setup because SKIP_NOTARIZE is true."
             echo "notary_ready=false" >> "$GITHUB_OUTPUT"
           else
+            # Deliberately NOT named AppliMacVincentGithub. That profile lives in the maintainer's
+            # login keychain and a runner can never reach it; this one is rebuilt from scratch on
+            # every run out of the Apple secrets. Same credentials, different lifetime — keeping
+            # the names distinct stops the two from being mistaken for each other.
             xcrun notarytool store-credentials "dev-island-notary" \
               --apple-id "${{ secrets.APPLE_ID }}" \
               --team-id "${{ secrets.APPLE_TEAM_ID }}" \
@@ -109,6 +113,12 @@ jobs:
           DEV_ISLAND_VERSION: ${{ steps.version.outputs.version }}
           DEV_ISLAND_BUILD_NUMBER: ${{ github.run_number }}
           DEV_ISLAND_SIGN_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          # Empty on purpose. package-app.sh defaults to the AppliMacVincentGithub keychain
+          # profile for local releases; a runner has no login keychain, so notarization here is
+          # owned by the dedicated "Notarize" step below, against the throwaway profile the
+          # signing step builds from the Apple secrets. Leave this unset and package-app.sh would
+          # submit against a profile that does not exist on the runner.
+          DEV_ISLAND_NOTARY_PROFILE: ""
           DEV_ISLAND_UNIVERSAL: "true"
         run: zsh scripts/package-app.sh
 
