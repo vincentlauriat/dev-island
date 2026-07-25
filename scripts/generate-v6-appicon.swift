@@ -8,7 +8,8 @@
 // script after any design tweak, then run the Python pipeline.
 //
 // Spec (from design/v6-bundle, components/logos_v7.jsx -> AppIcon_BarDot):
-// - Paper tone: background #f1ead9, mark #0d0d0f, foreground #f1ead9
+// - Paper tone: background #EDE9FE, mark #2E1065, foreground #EDE9FE (fork palette;
+//   upstream's warm pair was #f1ead9 / #0d0d0f)
 // - Outer squircle: corner radius = size * 0.225 (full-bleed, no shadow
 //   baked in — macOS supplies its own drop shadow)
 // - Inner Bar+Dot mark (160×64 viewBox), scaled to 72% of outer width
@@ -21,8 +22,12 @@ import Foundation
 let outputPath = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
     .appendingPathComponent("Assets/Brand/app-icon-v6.png")
 
-let paper = CGColor(red: 0xf1/255.0, green: 0xea/255.0, blue: 0xd9/255.0, alpha: 1)
-let ink   = CGColor(red: 0x0d/255.0, green: 0x0d/255.0, blue: 0x0f/255.0, alpha: 1)
+// Fork palette. Upstream ships warm paper (#f1ead9) + near-black ink; Dev Island uses a violet
+// pair so the two apps are told apart at a glance in the Dock when both are installed. The
+// geometry is untouched: the squircle-with-a-bar is the product's own metaphor (an island in the
+// notch showing a status bar), and it earns its keep.
+let paper = CGColor(red: 0xED/255.0, green: 0xE9/255.0, blue: 0xFE/255.0, alpha: 1)
+let ink   = CGColor(red: 0x2E/255.0, green: 0x10/255.0, blue: 0x65/255.0, alpha: 1)
 let ring  = CGColor(red: 0, green: 0, blue: 0, alpha: 0.06)
 
 func render(px: Int) -> Data {

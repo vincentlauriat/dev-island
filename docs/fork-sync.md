@@ -24,6 +24,7 @@ judgement on a sync:**
 | `scripts/package-app.sh` | Sparkle keys emitted conditionally instead of hardcoded |
 | `.github/workflows/release.yml` | Homebrew tap step disabled |
 | `.github/workflows/ci.yml` | Extra `rebrand.sh --check` guard step |
+| `scripts/generate-v6-appicon.swift`, `Assets/Brand/**` | Fork icon palette + the regenerated binaries |
 | `scripts/rebrand.sh`, `docs/fork-sync.md` | They *are* the rebrand |
 
 ## Syncing
@@ -137,9 +138,15 @@ Then re-approve the prompts in System Settings → Privacy & Security.
 
 ## Known gaps
 
-- **Visual identity**: icons are upstream's artwork, renamed. `scripts/generate_brand_icons.py` and
-  `scripts/generate-v6-appicon.swift` are the path to a real Dev Island icon set. Same for
-  `docs/images/readme-banner.svg` and `docs/images/demo.gif`, whose *text* was rebranded but whose
-  artwork is still upstream's.
+- **Visual identity**: the app icon now uses a fork palette (violet `#2E1065` on `#EDE9FE`) instead
+  of upstream's warm cream/black. The *geometry* — the "Bar+Dot" island — is still upstream's, kept
+  deliberately: it is the product's own metaphor. A distinct shape would mean authoring new vector
+  art in `scripts/generate-v6-appicon.swift`.
+  - Beware the pipeline: `scripts/generate_brand_icons.py` does **not** render the app icon. Its
+    `SCOUT_PATTERN` / `render_app_icon()` are dead leftovers of an abandoned mascot design, and the
+    `Assets/Brand/Internal/**` assets it emits are referenced nowhere in `Sources/`. Edit the Swift
+    renderer, run it, then run the Python pipeline to redistribute.
+  - `docs/images/readme-banner.svg` and `docs/images/demo.gif` still carry upstream's artwork —
+    only their *text* was rebranded.
 - **`ios/`** is a separate Xcode project outside the SwiftPM package. It is not covered by
   `swift build` / `swift test`, so its rename is verified by inspection only.

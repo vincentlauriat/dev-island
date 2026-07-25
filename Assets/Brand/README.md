@@ -1,6 +1,6 @@
 # Brand Assets
 
-This directory contains the current `Scout` mascot icon assets for macOS app packaging and internal product surfaces.
+This directory contains the Dev Island icon assets for macOS app packaging and internal product surfaces.
 
 Structure:
 
@@ -42,6 +42,17 @@ Why both formats exist:
 
 Current design direction:
 
-- shell: black glass face with a cool metallic rim
-- mark: white `Scout` mascot with the three-square punctuation column from the chosen icon reference
-- internal surfaces: simplified mascot-only versions without punctuation when space is tight
+- shell: full-bleed squircle in `#EDE9FE`, corner radius = size × 0.225, no baked-in shadow
+  (macOS supplies its own)
+- mark: the "Bar+Dot" island in `#2E1065` — a stylized notch with a status bar and a trailing dot,
+  cut out in the paper tone. This fork keeps upstream's geometry and changes only the palette;
+  upstream ships the same shape in warm paper `#f1ead9` / near-black `#0d0d0f`.
+
+Two things worth knowing before editing anything here:
+
+- **The app icon does not come from `generate_brand_icons.py`.** That script's `SCOUT_PATTERN`
+  and `render_app_icon()` are leftovers from an earlier mascot design the shipping icon
+  abandoned — `write_app_icons()` reads `app-icon-v6.png` and ignores them. To change the app
+  icon, edit `scripts/generate-v6-appicon.swift`, run it, *then* run the Python pipeline to
+  redistribute into the iconsets and rebuild the `.icns`.
+- **`Internal/` is referenced nowhere in `Sources/`.** Those assets are generated but unused.
