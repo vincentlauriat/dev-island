@@ -76,9 +76,35 @@ jobs:
           # Clean up
           rm -f "$CERT_FILE"
 
+      - name: Check the Sparkle key pair is whole
+        env:
+          SPARKLE_EDDSA_KEY: ${{ secrets.SPARKLE_EDDSA_KEY }}
+          DEV_ISLAND_EDDSA_PUBLIC_KEY: ${{ vars.DEV_ISLAND_EDDSA_PUBLIC_KEY }}
+        run: |
+          # Both halves, or neither. Half-configured is the state that fails silently: with only
+          # the private secret set, the appcast ships EdDSA-signed updates while the packaged app
+          # carries no SUPublicEDKey to validate them, and nothing in the log says so.
+          if [[ -n "$SPARKLE_EDDSA_KEY" && -z "$DEV_ISLAND_EDDSA_PUBLIC_KEY" ]]; then
+            echo "::error::SPARKLE_EDDSA_KEY is set but the DEV_ISLAND_EDDSA_PUBLIC_KEY variable is not."
+            echo "Updates would be signed with a key the shipped app cannot verify. Set the public half:"
+            echo "  gh variable set DEV_ISLAND_EDDSA_PUBLIC_KEY -R \"\$GITHUB_REPOSITORY\""
+            exit 1
+          fi
+          if [[ -z "$SPARKLE_EDDSA_KEY" && -n "$DEV_ISLAND_EDDSA_PUBLIC_KEY" ]]; then
+            echo "::error::DEV_ISLAND_EDDSA_PUBLIC_KEY is set but the SPARKLE_EDDSA_KEY secret is not."
+            echo "The app would advertise a public key while no appcast entry ever gets signed."
+            exit 1
+          fi
+          if [[ -z "$SPARKLE_EDDSA_KEY" ]]; then
+            echo "Neither half set — shipping without auto-update. Intended pre-first-release state."
+          else
+            echo "Both halves set — auto-update enabled."
+          fi
+
       - name: Build and package (signed)
         env:
           DEV_ISLAND_APP_NAME: "Dev Island"
+          DEV_ISLAND_EDDSA_PUBLIC_KEY: ${{ vars.DEV_ISLAND_EDDSA_PUBLIC_KEY }}
           DEV_ISLAND_BUNDLE_ID: "app.devisland.DevIsland"
           DEV_ISLAND_VERSION: ${{ steps.version.outputs.version }}
           DEV_ISLAND_BUILD_NUMBER: ${{ github.run_number }}

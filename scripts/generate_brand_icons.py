@@ -204,28 +204,12 @@ def draw_mark(
             draw.rectangle((x, y, x + cell - 1, y + cell - 1), fill=palette["P"])
 
 
-def render_app_icon(size: int) -> Image.Image:
-    image, face = draw_app_shell(size)
-    draw = ImageDraw.Draw(image)
-
-    face_x, face_y, face_size, face_height = face
-    mark_width_units = 8
-    mark_height_units = 8
-    cell = max(1, min(face_size // (mark_width_units + 3), face_height // (mark_height_units + 3)))
-    mark_width = mark_width_units * cell
-    mark_height = mark_height_units * cell
-    origin_x = face_x + (face_size - mark_width) // 2
-    origin_y = face_y + (face_height - mark_height) // 2
-
-    palette = {
-        "B": rgba("#264653"),
-        "H": rgba("#E9F5F2"),
-        "E": rgba("#1A1C20"),
-    }
-
-    draw_mark_shadow(draw, (origin_x, origin_y), cell, SCOUT_PATTERN, 60)
-    draw_mark(draw, (origin_x, origin_y), cell, palette, include_punctuation=False)
-    return image
+# NOTE: the app icon is NOT rendered here. write_app_icons() reads
+# Assets/Brand/app-icon-v6.png, produced by scripts/generate-v6-appicon.swift. A
+# render_app_icon() used to sit at this spot, drawing the mascot the shipping icon
+# abandoned; nothing called it, and editing it to change the icon silently did nothing.
+# Removed for that reason. SCOUT_PATTERN below is still live — write_svg_master() and
+# write_internal_assets() use it.
 
 
 def render_color_mark(size: int) -> Image.Image:

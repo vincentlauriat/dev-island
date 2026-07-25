@@ -22,7 +22,8 @@ judgement on a sync:**
 | `README.md`, `README.zh-CN.md` | restore | Fork attribution, no Homebrew cask, no fork-owned community channels |
 | `appcast.xml` | restore | Reset to an empty feed, not rebranded |
 | `scripts/package-app.sh` | re-apply | Sparkle keys emitted conditionally instead of hardcoded |
-| `.github/workflows/release.yml` | re-apply | Homebrew tap step disabled |
+| `.github/workflows/release.yml` | re-apply | Homebrew tap step disabled; Sparkle public key passed from a repo variable + the key-pair consistency guard |
+| `scripts/generate_brand_icons.py` | re-apply | Dead `render_app_icon()` removed — upstream still has it |
 | `.github/workflows/ci.yml` | re-apply | Extra `rebrand.sh --check` guard step |
 | `scripts/generate-v6-appicon.swift` | re-apply | Fork icon palette — violet pair, upstream's geometry |
 | `Assets/Brand/**` | regenerate | Binaries derived from the renderer above |
@@ -56,10 +57,12 @@ git checkout HEAD -- README.md README.zh-CN.md appcast.xml
 # 3. re-apply — check each fork edit survived the merge, re-apply only what is missing.
 grep -q 'DEV_ISLAND_EDDSA_PUBLIC_KEY' scripts/package-app.sh              || echo 'MISSING: conditional Sparkle keys'
 grep -q 'if: false'                   .github/workflows/release.yml       || echo 'MISSING: Homebrew tap disabled'
+grep -q 'DEV_ISLAND_EDDSA_PUBLIC_KEY' .github/workflows/release.yml       || echo 'MISSING: Sparkle public key wiring + guard'
 grep -q 'rebrand.sh --check'          .github/workflows/ci.yml            || echo 'MISSING: rebrand guard step'
 grep -q '0xED/255.0'                  scripts/generate-v6-appicon.swift   || echo 'MISSING: fork icon palette'
-git diff HEAD -- scripts/package-app.sh .github/workflows/release.yml \
-                 .github/workflows/ci.yml scripts/generate-v6-appicon.swift
+grep -q 'def render_app_icon'         scripts/generate_brand_icons.py     && echo 'REVERTED: dead render_app_icon() is back'
+git diff HEAD -- scripts/package-app.sh .github/workflows/release.yml .github/workflows/ci.yml \
+                 scripts/generate-v6-appicon.swift scripts/generate_brand_icons.py
 
 # 4. regenerate — after the renderer's palette is back in place.
 swift scripts/generate-v6-appicon.swift
