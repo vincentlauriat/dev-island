@@ -3,27 +3,27 @@
 import PackageDescription
 
 let package = Package(
-    name: "OpenIsland",
+    name: "DevIsland",
     defaultLocalization: "en",
     platforms: [
         .macOS(.v14),
     ],
     products: [
         .library(
-            name: "OpenIslandCore",
-            targets: ["OpenIslandCore"]
+            name: "DevIslandCore",
+            targets: ["DevIslandCore"]
         ),
         .executable(
-            name: "OpenIslandHooks",
-            targets: ["OpenIslandHooks"]
+            name: "DevIslandHooks",
+            targets: ["DevIslandHooks"]
         ),
         .executable(
-            name: "OpenIslandSetup",
-            targets: ["OpenIslandSetup"]
+            name: "DevIslandSetup",
+            targets: ["DevIslandSetup"]
         ),
         .executable(
-            name: "OpenIslandApp",
-            targets: ["OpenIslandApp"]
+            name: "DevIslandApp",
+            targets: ["DevIslandApp"]
         ),
     ],
     dependencies: [
@@ -32,20 +32,20 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "OpenIslandCore"
+            name: "DevIslandCore"
         ),
         .executableTarget(
-            name: "OpenIslandHooks",
-            dependencies: ["OpenIslandCore"]
+            name: "DevIslandHooks",
+            dependencies: ["DevIslandCore"]
         ),
         .executableTarget(
-            name: "OpenIslandSetup",
-            dependencies: ["OpenIslandCore"]
+            name: "DevIslandSetup",
+            dependencies: ["DevIslandCore"]
         ),
         .executableTarget(
-            name: "OpenIslandApp",
+            name: "DevIslandApp",
             dependencies: [
-                "OpenIslandCore",
+                "DevIslandCore",
                 .product(name: "MarkdownUI", package: "swift-markdown-ui"),
                 .product(name: "Sparkle", package: "Sparkle"),
             ],
@@ -54,12 +54,12 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "OpenIslandCoreTests",
-            dependencies: ["OpenIslandCore"]
+            name: "DevIslandCoreTests",
+            dependencies: ["DevIslandCore"]
         ),
         .testTarget(
-            name: "OpenIslandAppTests",
-            dependencies: ["OpenIslandApp", "OpenIslandCore"]
+            name: "DevIslandAppTests",
+            dependencies: ["DevIslandApp", "DevIslandCore"]
         ),
     ]
 )
