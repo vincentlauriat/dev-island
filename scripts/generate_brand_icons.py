@@ -273,7 +273,7 @@ def render_badge(size: int) -> Image.Image:
 
 
 def write_app_icons() -> None:
-    # v6 Bar+Dot master is the sole source. Run
+    # The spectacles-in-the-island master is the sole source. Run
     # `swift scripts/generate-v6-appicon.swift` if it's missing.
     source_path = BRAND_ROOT / "app-icon-v6.png"
     if not source_path.exists():
