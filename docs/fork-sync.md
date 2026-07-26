@@ -17,7 +17,7 @@ That leaves a short, enumerable list of files the script cannot regenerate becau
 fork-specific decisions rather than a mechanical rename. **These are the only files that need human
 judgement on a sync:**
 
-| File | Bucket | Why it is hand-maintained |
+| File | Bucket | Why it needs attention on a sync |
 |---|---|---|
 | `README.md`, `README.zh-CN.md` | restore | Fork attribution, no Homebrew cask, no fork-owned community channels |
 | `appcast.xml` | restore | Reset to an empty feed, not rebranded |
@@ -97,9 +97,16 @@ git add -A && git commit -m "chore: merge upstream vX.Y.Z and regenerate rebrand
 
 Step 4 needs Pillow, which nothing in the repo declares: `python3 -m venv .venv && .venv/bin/pip
 install Pillow`, then run the pipeline with `.venv/bin/python`. `.venv/` is gitignored, so the
-`git add -A` at the end of the block will not swallow it. Skip step 4 entirely if the merge left
-`scripts/generate-v6-appicon.swift` untouched — both generators are byte-stable, so regenerating
-produces no diff anyway.
+`git add -A` at the end of the block will not swallow it.
+
+Step 4 is cheap and worth running anyway, but it is not load-bearing: `scripts/package-app.sh` and
+`scripts/launch-dev-app.sh` both run the generators themselves before touching their output, so a
+tree that has never generated anything still builds. Running it here just surfaces a broken
+generator at merge time rather than mid-build.
+
+The generators are deterministic *for a given Pillow*, not across versions — an upgrade shifts the
+PNG bytes. That used to matter, because the shifted bytes landed on tracked files and left the tree
+dirty; step 5 is why it no longer does.
 
 Step 3 flags only what the merge actually dropped. `-X theirs` resolves *conflicting* hunks, not
 whole files: an upstream change to a different part of `ci.yml` three-way-merges cleanly and leaves
