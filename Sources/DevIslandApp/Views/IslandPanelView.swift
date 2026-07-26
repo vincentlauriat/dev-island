@@ -1408,7 +1408,10 @@ private struct IslandSessionRow: View {
 
     private func sideBadge(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 10.5, weight: .medium, design: .monospaced))
+            // 8.5 rather than the 10.5 the rest of the badge row uses: the terminal name is the
+            // longest string in that row and was crowding it. Applies to the SSH badge too — the
+            // two share this component, and sizing sibling capsules differently reads as a bug.
+            .font(.system(size: 8.5, weight: .medium, design: .monospaced))
             .foregroundStyle(V6Palette.paper.opacity(presentation == .notification ? 0.52 : 0.7))
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
