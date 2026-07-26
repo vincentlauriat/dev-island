@@ -1,5 +1,5 @@
 #!/usr/bin/env swift
-// Renders the canonical v6 Dev Island app icon source bitmap.
+// Renders the canonical Dev Island app icon source bitmap.
 //
 // Produces a single 1024×1024 PNG at Assets/Brand/app-icon-v6.png. That
 // image is the sole "master" — the Python pipeline
@@ -7,13 +7,21 @@
 // AppIcon.appiconset slot and then composes DevIsland.icns. Re-run this
 // script after any design tweak, then run the Python pipeline.
 //
-// Spec (from design/v6-bundle, components/logos_v7.jsx -> AppIcon_BarDot):
+// Spec — "Spectacles in the island" (fork-specific; upstream ships Bar+Dot):
 // - Paper tone: background #EDE9FE, mark #2E1065, foreground #EDE9FE (fork palette;
 //   upstream's warm pair was #f1ead9 / #0d0d0f)
 // - Outer squircle: corner radius = size * 0.225 (full-bleed, no shadow
 //   baked in — macOS supplies its own drop shadow)
-// - Inner Bar+Dot mark (160×64 viewBox), scaled to 72% of outer width
+// - Inner mark in a 160×64 viewBox, scaled to 72% of outer width: a fully
+//   rounded pill (the island) carrying a pair of round spectacles — two
+//   outlined lenses, a bridge, and temples running out to the pill ends.
 // - 1px ink ring at rgba(0,0,0,0.06) for edge crispness
+//
+// Why outlines rather than filled lenses: filled discs read as eyes or a power
+// socket. The bridge is what makes the shape parse as spectacles, and the
+// temples are what tie the frame into the island instead of leaving it afloat
+// with dead ink at both ends. Checked at 32px — the size the menu bar uses —
+// where thin strokes are the first thing to close up.
 
 import AppKit
 import CoreGraphics
@@ -23,12 +31,19 @@ let outputPath = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
     .appendingPathComponent("Assets/Brand/app-icon-v6.png")
 
 // Fork palette. Upstream ships warm paper (#f1ead9) + near-black ink; Dev Island uses a violet
-// pair so the two apps are told apart at a glance in the Dock when both are installed. The
-// geometry is untouched: the squircle-with-a-bar is the product's own metaphor (an island in the
-// notch showing a status bar), and it earns its keep.
+// pair so the two apps are told apart at a glance in the Dock when both are installed.
 let paper = CGColor(red: 0xED/255.0, green: 0xE9/255.0, blue: 0xFE/255.0, alpha: 1)
 let ink   = CGColor(red: 0x2E/255.0, green: 0x10/255.0, blue: 0x65/255.0, alpha: 1)
 let ring  = CGColor(red: 0, green: 0, blue: 0, alpha: 0.06)
+
+// Mark geometry, in 160×64 viewBox units.
+let lensRadius: CGFloat = 22
+let lensLeftX: CGFloat = 52
+let lensRightX: CGFloat = 108
+let lensCenterY: CGFloat = 32
+let strokeWeight: CGFloat = 6
+let templeLeftEnd: CGFloat = 14    // stops short of the pill edge so ink keeps a margin
+let templeRightEnd: CGFloat = 146
 
 func render(px: Int) -> Data {
     let size = CGFloat(px)
@@ -70,63 +85,58 @@ func render(px: Int) -> Data {
     ctx.addPath(squircle)
     ctx.clip()
 
-    // Mark: Bar + Dot in a 160×64 viewBox, scaled to 72% of outer width,
-    // centered. Flat-top + rounded-bottom pill (bottom radius = h/2).
+    // The island: a fully rounded pill (corner radius = h/2), centered.
     let markW = rect.width * 0.72
     let markH = markW * 64.0 / 160.0
-    let markX = rect.midX - markW / 2
-    let markYCG = rect.midY - markH / 2
-    let markRect = CGRect(x: markX, y: markYCG, width: markW, height: markH)
-    let markRadius = markH / 2
-
-    let markPath = CGMutablePath()
-    // CG origin is bottom-left: (markRect.minX, markRect.minY) is the
-    // BOTTOM-left of the pill; we build flat-top + rounded-bottom.
-    markPath.move(to: CGPoint(x: markRect.minX, y: markRect.maxY))
-    markPath.addLine(to: CGPoint(x: markRect.maxX, y: markRect.maxY))
-    markPath.addLine(to: CGPoint(x: markRect.maxX, y: markRect.minY + markRadius))
-    markPath.addArc(
-        center: CGPoint(x: markRect.maxX - markRadius, y: markRect.minY + markRadius),
-        radius: markRadius,
-        startAngle: 0,
-        endAngle: -.pi / 2,
-        clockwise: true
+    let markRect = CGRect(
+        x: rect.midX - markW / 2,
+        y: rect.midY - markH / 2,
+        width: markW,
+        height: markH
     )
-    markPath.addLine(to: CGPoint(x: markRect.minX + markRadius, y: markRect.minY))
-    markPath.addArc(
-        center: CGPoint(x: markRect.minX + markRadius, y: markRect.minY + markRadius),
-        radius: markRadius,
-        startAngle: -.pi / 2,
-        endAngle: .pi,
-        clockwise: true
-    )
-    markPath.closeSubpath()
+    let u = markW / 160.0   // one viewBox unit, in points
 
-    ctx.setFillColor(ink)
-    ctx.addPath(markPath)
-    ctx.fillPath()
-
-    // Bar (70×7 in viewBox, centered vertically; 30..100 horizontally).
-    let barW = markW * 70.0 / 160.0
-    let barH = markH * 7.0 / 64.0
-    let barX = markRect.minX + markW * 30.0 / 160.0
-    let barY = markRect.minY + (markH - barH) / 2
-    let bar = CGPath(
-        roundedRect: CGRect(x: barX, y: barY, width: barW, height: barH),
-        cornerWidth: barH / 2,
-        cornerHeight: barH / 2,
+    let pill = CGPath(
+        roundedRect: markRect,
+        cornerWidth: markH / 2,
+        cornerHeight: markH / 2,
         transform: nil
     )
-    ctx.setFillColor(paper)
-    ctx.addPath(bar)
+    ctx.setFillColor(ink)
+    ctx.addPath(pill)
     ctx.fillPath()
 
-    // Trailing dot (r=5 at (118, 32) in viewBox).
-    let dotR = markH * 5.0 / 64.0
-    let dotCX = markRect.minX + markW * 118.0 / 160.0
-    let dotCY = markRect.minY + markH / 2
-    ctx.setFillColor(paper)
-    ctx.fillEllipse(in: CGRect(x: dotCX - dotR, y: dotCY - dotR, width: dotR * 2, height: dotR * 2))
+    // viewBox point -> device point. CG origin is bottom-left, and the mark is
+    // vertically symmetric, so no Y flip is needed.
+    func vb(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
+        CGPoint(x: markRect.minX + x * u, y: markRect.minY + y * u)
+    }
+
+    let leftC = vb(lensLeftX, lensCenterY)
+    let rightC = vb(lensRightX, lensCenterY)
+    let r = lensRadius * u
+
+    ctx.setStrokeColor(paper)
+    ctx.setLineWidth(strokeWeight * u)
+    ctx.setLineCap(.round)
+
+    // Temples, then bridge, then lenses — drawn in that order so the lens rings
+    // sit on top of the joints rather than showing seams through them.
+    ctx.move(to: CGPoint(x: leftC.x - r, y: leftC.y))
+    ctx.addLine(to: vb(templeLeftEnd, lensCenterY))
+    ctx.strokePath()
+
+    ctx.move(to: CGPoint(x: rightC.x + r, y: rightC.y))
+    ctx.addLine(to: vb(templeRightEnd, lensCenterY))
+    ctx.strokePath()
+
+    ctx.move(to: CGPoint(x: leftC.x + r, y: leftC.y))
+    ctx.addLine(to: CGPoint(x: rightC.x - r, y: rightC.y))
+    ctx.strokePath()
+
+    for c in [leftC, rightC] {
+        ctx.strokeEllipse(in: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2))
+    }
 
     ctx.restoreGState()
 

@@ -44,9 +44,12 @@ Current design direction:
 
 - shell: full-bleed squircle in `#EDE9FE`, corner radius = size × 0.225, no baked-in shadow
   (macOS supplies its own)
-- mark: the "Bar+Dot" island in `#2E1065` — a stylized notch with a status bar and a trailing dot,
-  cut out in the paper tone. This fork keeps upstream's geometry and changes only the palette;
-  upstream ships the same shape in warm paper `#f1ead9` / near-black `#0d0d0f`.
+- mark: a pair of round spectacles set into the island pill, in `#2E1065` with the frame cut out in
+  the paper tone — two outlined lenses, a bridge, and temples running out toward the pill ends.
+  Fork-specific in both shape and palette: upstream ships a "Bar+Dot" island (a status bar with a
+  trailing dot) in warm paper `#f1ead9` / near-black `#0d0d0f`.
+  The outlines are deliberate — filled discs read as eyes or a power socket, and it is the bridge
+  that makes the shape parse as spectacles at all. Judge any edit at 32 px first.
 
 Two things worth knowing before editing anything here:
 

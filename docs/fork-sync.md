@@ -26,7 +26,7 @@ judgement on a sync:**
 | `scripts/release.sh` | keep | Fork-only. Upstream has no equivalent, so the merge leaves it alone |
 | `scripts/generate_brand_icons.py` | re-apply | Dead `render_app_icon()` removed — upstream still has it |
 | `.github/workflows/ci.yml` | re-apply | Extra `rebrand.sh --check` guard step |
-| `scripts/generate-v6-appicon.swift` | re-apply | Fork icon palette — violet pair, upstream's geometry |
+| `scripts/generate-v6-appicon.swift` | re-apply | Fork icon — violet palette *and* fork-only geometry (spectacles in the island) |
 | `Assets/Brand/**` generated output | untrack | Upstream tracks these binaries; this fork gitignores them and regenerates instead |
 | `scripts/rebrand.sh`, `docs/fork-sync.md` | untouched | They *are* the rebrand, and upstream does not have them — the merge leaves them alone |
 
@@ -74,6 +74,7 @@ test ! -e .github/workflows/notary-preflight.yml || echo 'RESURRECTED: notary pr
 test -x scripts/release.sh                       || echo 'MISSING: local release script'
 grep -q 'rebrand.sh --check'          .github/workflows/ci.yml            || echo 'MISSING: rebrand guard step'
 grep -q '0xED/255.0'                  scripts/generate-v6-appicon.swift   || echo 'MISSING: fork icon palette'
+grep -q 'lensRadius'                  scripts/generate-v6-appicon.swift   || echo 'MISSING: fork icon geometry (spectacles)'
 grep -q 'app icon is NOT rendered here' scripts/generate_brand_icons.py   || echo 'MISSING: dead render_app_icon() came back'
 git diff HEAD -- scripts/package-app.sh .github/workflows/ci.yml \
                  scripts/generate-v6-appicon.swift scripts/generate_brand_icons.py
@@ -222,10 +223,11 @@ Then re-approve the prompts in System Settings → Privacy & Security.
 
 ## Known gaps
 
-- **Visual identity**: the app icon now uses a fork palette (violet `#2E1065` on `#EDE9FE`) instead
-  of upstream's warm cream/black. The *geometry* — the "Bar+Dot" island — is still upstream's, kept
-  deliberately: it is the product's own metaphor. A distinct shape would mean authoring new vector
-  art in `scripts/generate-v6-appicon.swift`.
+- **Visual identity**: the app icon diverges from upstream in both palette *and* geometry. Palette
+  is violet `#2E1065` on `#EDE9FE` instead of upstream's warm cream/black; the mark is a pair of
+  round spectacles set into the island pill, replacing upstream's "Bar+Dot". Both live in
+  `scripts/generate-v6-appicon.swift`, so a sync that takes upstream's version wholesale loses the
+  fork's icon entirely — see the markers in step 3.
   - Beware the pipeline: `scripts/generate_brand_icons.py` does **not** render the app icon. Its
     `SCOUT_PATTERN` / `render_app_icon()` are dead leftovers of an abandoned mascot design, and the
     `Assets/Brand/Internal/**` assets it emits are referenced nowhere in `Sources/`. Edit the Swift
