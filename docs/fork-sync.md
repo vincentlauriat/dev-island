@@ -27,7 +27,7 @@ judgement on a sync:**
 | `scripts/generate_brand_icons.py` | re-apply | Dead `render_app_icon()` removed — upstream still has it |
 | `.github/workflows/ci.yml` | re-apply | Extra `rebrand.sh --check` guard step |
 | `scripts/generate-v6-appicon.swift` | re-apply | Fork icon palette — violet pair, upstream's geometry |
-| `Assets/Brand/**` | regenerate | Binaries derived from the renderer above |
+| `Assets/Brand/**` generated output | untrack | Upstream tracks these binaries; this fork gitignores them and regenerates instead |
 | `scripts/rebrand.sh`, `docs/fork-sync.md` | untouched | They *are* the rebrand, and upstream does not have them — the merge leaves them alone |
 
 Each bucket is handled differently, and the sync commands below follow them:
@@ -35,9 +35,14 @@ Each bucket is handled differently, and the sync commands below follow them:
 - **restore** — upstream's version is meaningless here. Take the fork's wholesale.
 - **re-apply** — upstream's changes matter and the fork's edit is surgical. Read the diff, keep
   upstream's merged version, put the fork's edit back by hand.
-- **regenerate** — do *not* restore these. Re-run the generators. Restoring would bring back
-  `DevIsland.icns` while the merged tree still carries upstream's `OpenIsland.icns`, leaving both
-  until `rebrand.sh` untangles it; regenerating sidesteps that entirely.
+- **untrack** — the generated brand binaries. Upstream keeps them under version control; this fork
+  does not, because every consumer regenerates them before use and Pillow's output shifts between
+  encoder versions, which left `scripts/release.sh` refusing to run on a tree its own build had
+  dirtied. `.gitignore` cannot help here: a merge re-adds upstream's *tracked* copies, and
+  gitignore never applies to files already in the index. So re-run the generators, then
+  `git rm -r --cached` whatever came back. Restoring the fork's old copies would also be wrong —
+  it would bring back `DevIsland.icns` while the merged tree still carries upstream's
+  `OpenIsland.icns`, leaving both until `rebrand.sh` untangles it.
 - **delete** — upstream keeps re-adding these; delete them after every merge. They are not
   disabled-in-place because a disabled workflow still invites someone to re-enable it.
 - **keep** / **untouched** — fork-only files upstream has no version of. The merge cannot touch
@@ -76,6 +81,15 @@ git diff HEAD -- scripts/package-app.sh .github/workflows/ci.yml \
 # 4. regenerate — after the renderer's palette is back in place.
 swift scripts/generate-v6-appicon.swift
 .venv/bin/python scripts/generate_brand_icons.py   # needs Pillow — see below
+.venv/bin/python scripts/generate_dmg_background.py
+
+# 5. untrack — the merge re-adds upstream's tracked copies of the generated binaries, and
+#    .gitignore does not apply to anything already in the index. `if` rather than `&& echo`:
+#    on the healthy path grep exits 1, which would abort a pasted block under `set -e`.
+if git ls-files Assets/Brand | grep -qv -e app-icon-v6.png -e README.md -e Source/; then
+    echo 'RESURRECTED: generated brand assets are tracked again — git rm -r --cached them'
+    git ls-files Assets/Brand | grep -v -e app-icon-v6.png -e README.md -e Source/
+fi
 
 bash scripts/rebrand.sh --check && swift build && swift test
 git add -A && git commit -m "chore: merge upstream vX.Y.Z and regenerate rebrand"
