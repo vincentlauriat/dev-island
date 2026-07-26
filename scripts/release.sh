@@ -77,6 +77,25 @@ if git rev-parse "v$VERSION" >/dev/null 2>&1; then
     die "Tag v$VERSION already exists."
 fi
 
+# package-app.sh shells out to python3 (icon + DMG background generation, early) and to
+# create-dmg (right at the end, AFTER notarization). A missing create-dmg therefore burns an
+# Apple submission before failing, so both are checked here rather than discovered mid-run.
+step "Checking the packaging tools"
+command -v create-dmg >/dev/null \
+    || die "create-dmg is not installed.  brew install create-dmg"
+
+if ! python3 -c "import PIL" >/dev/null 2>&1; then
+    if [[ -x "$repo_root/.venv/bin/python" ]] && "$repo_root/.venv/bin/python" -c "import PIL" >/dev/null 2>&1; then
+        # package-app.sh calls `python3` by name, so put the venv ahead of it on PATH
+        # rather than patching the script and adding another divergence from upstream.
+        PATH="$repo_root/.venv/bin:$PATH"
+        export PATH
+    else
+        die "python3 has no Pillow, and .venv does not provide it either.
+   python3 -m venv .venv && .venv/bin/pip install Pillow"
+    fi
+fi
+
 step "Checking the signing identity"
 security find-identity -v -p codesigning 2>/dev/null | grep -qF "$SIGNING_IDENTITY" \
     || die "Signing identity not found in the keychain: $SIGNING_IDENTITY"
