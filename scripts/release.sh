@@ -153,6 +153,12 @@ zsh "$repo_root/scripts/update-appcast.sh" "$VERSION" "$build_number" "$ed_signa
 
 mkdir -p "$release_dir"
 dmg_path="$release_dir/Dev-Island-$VERSION.dmg"
+
+# Clear the previous run's artifacts first. Dev.Island.zip has a fixed name shared by every
+# version, so if a copy failed here the stale zip from an earlier release would sit next to a
+# freshly written appcast entry describing different bytes — and get published.
+rm -f "$dmg_path" "$release_dir/Dev.Island.zip"
+
 cp "$dmg_src" "$dmg_path"
 cp "$zip_path" "$release_dir/Dev.Island.zip"   # name must match the appcast enclosure URL
 
