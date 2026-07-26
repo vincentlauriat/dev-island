@@ -15,5 +15,18 @@
             whose public half is pinned in scripts/release.sh. See docs/release-signing.md.
         -->
         <!-- Items are added by the release workflow. See docs/releasing.md. -->
+        <item>
+            <title>Version 1.0.0</title>
+            <sparkle:version>988</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <pubDate>Sun, 26 Jul 2026 10:24:51 +0000</pubDate>
+            <enclosure
+                url="https://github.com/vincentlauriat/dev-island/releases/download/v1.0.0/Dev.Island.zip"
+                type="application/octet-stream"
+                sparkle:edSignature="/5/5hGC5+akZIs+9lcAIx2WDOO/f30ZgVGk3eMaAFzxwzIN7XEBQOpys65kcfeMCIY39UgzQNnk1ixdBHvbRAw=="
+                length="12157042"
+            />
+        </item>
     </channel>
 </rss>
