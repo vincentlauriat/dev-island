@@ -96,6 +96,14 @@ if ! python3 -c "import PIL" >/dev/null 2>&1; then
     fi
 fi
 
+# update-appcast.sh inserts after this exact comment and fails if it is missing — which it does
+# at the very end of the run, once the build is already notarized. Check it up front.
+step "Checking the appcast insertion marker"
+grep -qF '<!-- Items are added by the release workflow. See docs/releasing.md. -->' "$repo_root/appcast.xml" \
+    || die "appcast.xml has lost the marker comment scripts/update-appcast.sh inserts after.
+   Restore this line inside <channel>:
+     <!-- Items are added by the release workflow. See docs/releasing.md. -->"
+
 step "Checking the signing identity"
 security find-identity -v -p codesigning 2>/dev/null | grep -qF "$SIGNING_IDENTITY" \
     || die "Signing identity not found in the keychain: $SIGNING_IDENTITY"

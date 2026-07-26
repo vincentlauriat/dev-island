@@ -7,14 +7,13 @@
         <language>en</language>
         <!--
             Reset for this fork. Upstream's 48 entries were dropped rather than rebranded: every
-            one pointed at an Open Island ZIP and carried an EdDSA signature made with upstream's
+            one pointed at an upstream ZIP and carried an EdDSA signature made with upstream's
             private key. Renaming them would have left a feed that hands Dev Island users a
             different product on their next update check.
 
-            This feed stays empty until the fork has its own Sparkle keypair (Sparkle's
-            `generate_keys`): the public half goes to scripts/package-app.sh as
-            DEV_ISLAND_EDDSA_PUBLIC_KEY, the private half becomes the SPARKLE_EDDSA_KEY repository
-            secret. Items are added by the release workflow. See docs/releasing.md.
+            Entries are signed with the key held in the login keychain under account "DevIsland",
+            whose public half is pinned in scripts/release.sh. See docs/release-signing.md.
         -->
+        <!-- Items are added by the release workflow. See docs/releasing.md. -->
     </channel>
 </rss>
