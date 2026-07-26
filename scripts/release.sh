@@ -51,9 +51,10 @@ SPARKLE_ACCOUNT="${SPARKLE_ACCOUNT:-DevIsland}"
 SIGNING_IDENTITY="${SIGNING_IDENTITY:-Developer ID Application: Vincent LAURIAT (KFLACS69T9)}"
 NOTARY_PROFILE="${NOTARY_PROFILE:-AppliMacVincentGithub}"
 
-# Public half of the Sparkle key, pinned. Fill this in once, after running
-# `generate_keys --account DevIsland`, and never change it again.
-EXPECTED_ED_PUBLIC_KEY=""
+# Public half of the Sparkle key, pinned. Generated 2026-07-26 with
+# `generate_keys --account DevIsland`. Never change it: every installed copy
+# validates updates against this exact value.
+EXPECTED_ED_PUBLIC_KEY="cQjrKru74Ib0Q/tCX7ZXfWApKf5/d7TLbaUTr5kRIoI="
 
 release_dir="$repo_root/release"
 sparkle_bin="$repo_root/.build/artifacts/sparkle/Sparkle/bin"
