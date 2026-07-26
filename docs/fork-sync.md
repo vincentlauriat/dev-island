@@ -41,7 +41,9 @@ The three buckets need different handling, and the sync commands below follow th
 ## Syncing
 
 ```bash
-git fetch upstream
+# --no-tags is not optional. A plain `git fetch upstream` auto-follows tags reachable from the
+# fetched history and drags all 50 upstream release tags back in, undoing the version reset.
+git fetch --no-tags upstream
 
 # --no-commit keeps HEAD on the pre-merge commit, so `git checkout HEAD -- <file>` below
 # really does restore the fork's version. Without it the merge auto-commits and those
@@ -137,6 +139,20 @@ and Open Island run side by side on one machine.
 
 **Consequence**: hooks installed by Open Island keep pointing at the old socket. Dev Island installs
 its own from its Settings window. This is intended, not a regression.
+
+## Versioning
+
+Dev Island's version numbering is **independent of upstream's**. The fork inherited 50 upstream
+release tags (`v0.1.0` → `v1.1.6`); they were deleted, and Dev Island's own history starts at
+`v1.0.0`. Upstream still owns every deleted tag, so nothing was lost.
+
+Two ways the inherited numbering can creep back, both silent:
+
+- `git fetch upstream` **without `--no-tags`** auto-follows tags reachable from the fetched
+  history and restores all 50. Hence the flag in the sync procedure above.
+- `git push --tags` after such a fetch republishes them to `origin`.
+
+Neither is hypothetical: a plain `git fetch upstream` was tested and did bring `v1.1.6` back.
 
 ## Release chain
 
