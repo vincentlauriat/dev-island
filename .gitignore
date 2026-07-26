@@ -16,6 +16,11 @@ build/
 Packages/
 Package.resolved
 
+# Release artifacts (no leading slash: applies at the root and inside release/)
+*.dmg
+*.zip
+release/release-notes-*.md
+
 # Local tooling artifacts
 .venv/
 .claude/

@@ -61,7 +61,8 @@ The project is past MVP and welcomes new ideas and creative directions, but the 
 
 ## Release
 
-- Triggered by pushing a `v*` tag to `main`. CI builds, signs, notarizes, publishes the DMG. Don't create the GitHub release manually — edit the draft CI produces.
+- **Releases are built locally, never in CI**: `zsh scripts/release.sh <version>` builds, signs, notarizes, staples, packages the DMG, signs the Sparkle update and writes the appcast entry. No GitHub secrets, no release workflow — CI only builds and tests. The script pushes nothing; it prints the `gh release create` to run. One-time keychain setup: `docs/release-signing.md`.
+- Versioning is independent of upstream and starts at `v1.0.0`. Sync with `git fetch --no-tags upstream` — a plain fetch drags upstream's tags back in.
 - Before tagging: `git fetch origin main` and review every merged PR since the last tag. Don't trust memory.
 - Bilingual required (English + 简体中文). Template: `.github/RELEASE_TEMPLATE.md`. Entry format: `- **Category**: English (#PR)\n  中文 (#PR)`. External contributors get `— Thanks @user` on the English line.
 - Title: `Dev Island vX.Y.Z — Short English Title`. Installation section bilingual.

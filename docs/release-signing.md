@@ -1,60 +1,90 @@
 # Release Signing & Notarization
 
-Dev Island releases are code-signed and notarized via GitHub Actions. This document explains how to set up the required secrets.
+Dev Island is signed and notarized **on the maintainer's machine**, by
+`scripts/release.sh`. There are no GitHub Actions secrets and no CI release
+workflow — CI only builds and tests.
 
-## Required GitHub Secrets
+Everything a release needs lives in the login keychain. This is a deliberate
+choice over the CI model inherited from upstream, where a runner needed the
+Developer ID certificate, its password, an app-specific password and the Sparkle
+private key uploaded as repository secrets — each one a second copy of something
+that already exists in exactly one place.
 
-Go to **Settings → Secrets and variables → Actions** in the repository and add:
+## One-time setup
 
-| Secret | Description |
-|--------|-------------|
-| `APPLE_CERTIFICATE_P12` | Base64-encoded Developer ID Application certificate (.p12) |
-| `APPLE_CERTIFICATE_PASSWORD` | Password for the .p12 file |
-| `APPLE_SIGNING_IDENTITY` | Signing identity string, e.g. `Developer ID Application: Your Name (TEAMID)` |
-| `APPLE_ID` | Apple ID email used for notarization |
-| `APPLE_TEAM_ID` | 10-character Apple Developer Team ID |
-| `APPLE_APP_SPECIFIC_PASSWORD` | App-specific password for notarization (generate at appleid.apple.com) |
+### 1. Developer ID certificate
 
-## How to export the certificate
-
-1. Open **Keychain Access** → **My Certificates**
-2. Find your **Developer ID Application** certificate
-3. Right-click → **Export** → save as `.p12` with a password
-4. Base64-encode it:
-   ```bash
-   base64 -i Certificates.p12 | pbcopy
-   ```
-5. Paste the result into the `APPLE_CERTIFICATE_P12` secret
-
-## How to generate an app-specific password
-
-1. Go to [appleid.apple.com](https://appleid.apple.com) → **Sign-In and Security** → **App-Specific Passwords**
-2. Generate a new password, label it `dev-island-notary`
-3. Save it as the `APPLE_APP_SPECIFIC_PASSWORD` secret
-
-## Local signed builds
-
-You can also build signed locally:
+Xcode → Settings → Accounts → Manage Certificates → **Developer ID Application**.
+Verify:
 
 ```bash
-export DEV_ISLAND_SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)"
-export DEV_ISLAND_NOTARY_PROFILE="dev-island-notary"
-export DEV_ISLAND_VERSION="0.2.0"
-
-# First, store notarization credentials (one-time):
-xcrun notarytool store-credentials "dev-island-notary" \
-  --apple-id "you@example.com" \
-  --team-id "TEAMID" \
-  --password "xxxx-xxxx-xxxx-xxxx"
-
-# Then build:
-zsh scripts/package-app.sh
+security find-identity -v -p codesigning
+# 1) … "Developer ID Application: Vincent LAURIAT (KFLACS69T9)"
 ```
 
-## Release flow
+### 2. Notarization credentials
 
-1. Merge all PRs to `main`
-2. Tag the release: `git tag v0.2.0 && git push origin v0.2.0`
-3. The `Release` workflow runs automatically — builds, signs, notarizes, and creates a draft GitHub Release
-4. Review the draft release and publish it
-5. Update `appcast.xml` for Sparkle auto-update
+One profile is shared by every macOS project on this machine — notarytool
+credentials are tied to the Apple ID and team, not to the app, so a per-project
+profile buys nothing.
+
+```bash
+xcrun notarytool store-credentials "AppliMacVincentGithub" \
+  --apple-id "<apple-id>" --team-id "KFLACS69T9"
+```
+
+It prompts for an **app-specific password** (generated at appleid.apple.com),
+not the account password. Verify:
+
+```bash
+xcrun notarytool history --keychain-profile "AppliMacVincentGithub"
+```
+
+### 3. Sparkle signing key
+
+```bash
+.build/artifacts/sparkle/Sparkle/bin/generate_keys --account DevIsland
+```
+
+**`--account DevIsland` is not optional.** Without it Sparkle falls back to a
+single global account shared by every app on the machine, so generating a key
+for Dev Island could overwrite another project's key and break auto-update for
+everyone already running it. Each app keeps its own account.
+
+`-p` reads an existing key without writing anything:
+
+```bash
+.build/artifacts/sparkle/Sparkle/bin/generate_keys -p --account DevIsland
+```
+
+Then:
+
+1. Paste the printed public key into `EXPECTED_ED_PUBLIC_KEY` in
+   `scripts/release.sh`. It is embedded in the app as `SUPublicEDKey`, and the
+   script refuses to build when the keychain and the pin disagree.
+2. Back the private half up somewhere safe:
+   ```bash
+   .build/artifacts/sparkle/Sparkle/bin/generate_keys -x dev-island-sparkle-key.txt --account DevIsland
+   ```
+   Losing it means no further auto-updates for anyone already installed, and
+   recovery is every user re-downloading by hand. The exported file is as
+   sensitive as the key; never commit it.
+
+## Never regenerate
+
+Once a release has shipped, the Sparkle key is fixed forever. Regenerating it,
+or editing `SUPublicEDKey`, makes every installed copy reject all future updates.
+The pin in `scripts/release.sh` turns that silent disaster into a refusal to
+build.
+
+## Verifying a build
+
+Never trust the packaging log alone:
+
+```bash
+spctl -a -t exec -vv "output/package/Dev Island.app"    # accepted, source=Notarized Developer ID
+xcrun stapler validate release/Dev-Island-<version>.dmg  # The validate action worked!
+codesign --verify --deep --strict "output/package/Dev Island.app"
+```
+
+`scripts/release.sh` runs the first two itself and aborts if either fails.

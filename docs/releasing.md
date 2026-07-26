@@ -1,66 +1,67 @@
 # Releasing
 
-How to cut a new GitHub release for Dev Island.
+Dev Island releases are built **locally**, not in CI. There are no GitHub secrets:
+the Developer ID certificate, the notarization credentials and the Sparkle signing
+key all live in the login keychain. See [release-signing.md](release-signing.md)
+for the one-time setup.
 
 ## Versioning
 
-Follow [Semantic Versioning](https://semver.org/):
+[Semantic Versioning](https://semver.org/). Dev Island's numbering is independent
+of upstream's and starts at `v1.0.0` — see the Versioning section of
+[fork-sync.md](fork-sync.md) for why, and for the `--no-tags` rule that keeps
+upstream's tags from creeping back.
 
-- **Patch** (0.1.x): bug fixes, doc updates, small improvements
-- **Minor** (0.x.0): new features, non-breaking changes
-- **Major** (x.0.0): breaking changes
-
-## Notarization Preflight
-
-Before pushing a release tag, validate the repository's Apple notarization
-credentials against Apple's service:
+## Cutting a release
 
 ```bash
-gh workflow run "Notary Preflight" --ref main
-gh run list --workflow "Notary Preflight" --limit 1
+git checkout main && git pull
+zsh scripts/release.sh 1.0.0
 ```
 
-Open the reported run and confirm that `Validate Apple notarization credentials`
-passes. Updated or expired Apple Developer agreements can make this check fail
-even while the existing Developer ID certificate can still sign an app.
+That single command builds a universal Release binary, signs it with Hardened
+Runtime, notarizes it, staples the ticket, produces the styled DMG, signs the
+update for Sparkle, and adds the entry to `appcast.xml`. It **pushes nothing** —
+it prints the `gh release create` invocation to run once the notes are written.
 
-The release workflow treats signing and notarization as required by default. Set
-the `SKIP_NOTARIZE` repository variable to `true` only when intentionally shipping
-a signed but non-notarized build.
+Before doing any of that it refuses to start unless:
 
-## Checklist
+- the version is `MAJOR.MINOR.PATCH` and its tag does not already exist;
+- the working tree is clean;
+- the Developer ID identity is in the keychain;
+- the notary profile answers (`notarytool history`);
+- **the Sparkle public key in the keychain matches the one pinned in the script.**
 
-1. **Confirm target**: ensure all intended changes are merged to `main`.
-2. **Build & package**:
-   ```bash
-   git checkout main && git pull
-   DEV_ISLAND_VERSION=<version> \
-   DEV_ISLAND_EDDSA_PUBLIC_KEY="<your-public-key>" \
-   zsh scripts/package-app.sh
-   ```
-   This produces `output/package/Dev Island.dmg` and `output/package/Dev Island.zip`.
-3. **Sign the update zip with EdDSA** (for Sparkle auto-update):
-   ```bash
-   .build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework/Versions/B/bin/sign_update \
-     "output/package/Dev Island.zip"
-   ```
-   Copy the `sparkle:edSignature` and `length` values for the appcast entry.
-4. **Update `appcast.xml`** in the repo root — add a new `<item>` entry with the version, download URL, EdDSA signature, and length. See the "Sparkle Appcast" section below.
-5. **Commit and push** the updated `appcast.xml` to `main`.
-6. **Create the release**:
-   ```bash
-   gh release create v<version> \
-     "output/package/Dev Island.dmg#Dev.Island.dmg" \
-     "output/package/Dev Island.zip#Dev.Island.zip" \
-     --target main \
-     --title "Dev Island v<version> — <Title>" \
-     --notes-file release-notes.md
-   ```
-7. **Verify**: open the release page and confirm assets are downloadable.
+That last check is the important one. A mismatch means the key was regenerated,
+and shipping an update signed with a new key would make every installed copy
+reject all future auto-updates. The script stops rather than build it.
 
-## Release Notes Format
+After packaging it re-verifies independently, because a packaging script that
+prints success is not evidence:
 
-All release notes **must be bilingual** (English + Simplified Chinese). Use the following template:
+```bash
+spctl -a -t exec -vv "output/package/Dev Island.app"   # source=Notarized Developer ID
+xcrun stapler validate release/Dev-Island-<version>.dmg
+```
+
+## Publishing
+
+```bash
+git add appcast.xml && git commit -m "chore: appcast for v1.0.0"
+git tag v1.0.0 && git push origin main v1.0.0
+gh release create v1.0.0 \
+  release/Dev-Island-1.0.0.dmg release/Dev.Island.zip \
+  --title "Dev Island v1.0.0 — <short English title>" \
+  --notes-file release/release-notes-1.0.0.md
+```
+
+The zip asset **must** keep the name `Dev.Island.zip`: `appcast.xml`'s enclosure
+URL points at it, and Sparkle downloads exactly that path. GitHub turns spaces
+into dots in asset names, which is where the odd-looking name comes from.
+
+## Release notes
+
+Bilingual, English + 简体中文. Template in `.github/RELEASE_TEMPLATE.md`.
 
 ```markdown
 ## Dev Island v<version> — <Title>
@@ -69,17 +70,7 @@ All release notes **must be bilingual** (English + Simplified Chinese). Use the 
 
 - <emoji> **Category**: English description (#PR)
   中文描述 (#PR)
-
----
-
-## Installation | 安装说明
-
-<< See "Installation Section" below >>
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
-
-### Change categories
 
 | Emoji | Category | When to use |
 |-------|----------|-------------|
@@ -87,50 +78,43 @@ All release notes **must be bilingual** (English + Simplified Chinese). Use the 
 | 🐛 | Fix | Bug fix |
 | 📸/📋 | Docs | Documentation changes |
 | ♻️ | Refactor | Code restructuring |
-| 🏗️ | Infra | Build, CI, packaging changes |
+| 🏗️ | Infra | Build, packaging changes |
 
-## Installation Section
+External contributors get `— Thanks @user` on the English line.
 
-**Include in every release** until code signing is in place. Remove once we ship a signed & notarized build.
+### Installation section
+
+Releases are signed and notarized, so **do not** carry the old
+`xattr -dr com.apple.quarantine` workaround: it is for unsigned builds and
+telling users to strip quarantine from a notarized app is worse than useless.
 
 ```markdown
 ## Installation | 安装说明
 
-1. Download **Dev Island.dmg**, open it, and drag **Dev Island** to **Applications**.
-   下载 **Dev Island.dmg**，打开后将 **Dev Island** 拖入 **Applications**。
+1. Download **Dev-Island-<version>.dmg**, open it, drag **Dev Island** to **Applications**.
+   下载 **Dev-Island-<version>.dmg**，打开后将 **Dev Island** 拖入 **Applications**。
 
-2. Since this is an unsigned app, macOS will show **"Dev Island is damaged"** when you try to open it. Run this command in Terminal to fix it:
-   由于应用未签名，macOS 会提示**「"Dev Island"已损坏」**。请在终端中执行以下命令：
-
-   ```bash
-   xattr -dr com.apple.quarantine "/Applications/Dev Island.app"
-   ```
-
-3. Requirements: **macOS 14+**, **Apple Silicon** (M1/M2/M3/M4/M5).
-   系统要求：**macOS 14+**，**Apple Silicon**（M1/M2/M3/M4/M5）。
-
-> ⚠️ **Note**: This is an unsigned early-access build. Code signing and notarization will be added once our Apple Developer account is approved.
-> **注意**：这是未签名的早期测试版。代码签名和 Apple 公证将在 Developer 账号审核通过后添加。
+2. Requirements: **macOS 14+**.
+   系统要求：**macOS 14+**。
 ```
 
 ## Assets
 
-Every release ships two artifacts:
-
 | File | Purpose |
 |------|---------|
-| `Dev Island.dmg` | Styled disk image with drag-to-Applications |
-| `Dev Island.zip` | Plain zip for automation / CI downloads |
+| `Dev-Island-<version>.dmg` | Styled disk image, drag-to-Applications |
+| `Dev.Island.zip` | Sparkle update payload — name is load-bearing |
 
-## Sparkle Appcast
+## Sparkle appcast
 
-The file `appcast.xml` in the repo root is the Sparkle update feed. It is served via GitHub raw content at:
+`appcast.xml` at the repo root is the update feed, served from:
 
 ```
 https://raw.githubusercontent.com/vincentlauriat/dev-island/main/appcast.xml
 ```
 
-Each release needs a new `<item>` entry. Template:
+`scripts/release.sh` adds each entry through `scripts/update-appcast.sh`; hand
+editing is only for fixing a mistake. Entry shape:
 
 ```xml
 <item>
@@ -142,27 +126,12 @@ Each release needs a new `<item>` entry. Template:
     <enclosure
         url="https://github.com/vincentlauriat/dev-island/releases/download/vX.Y.Z/Dev.Island.zip"
         type="application/octet-stream"
-        sparkle:edSignature="PASTE_SIGNATURE_HERE"
-        length="PASTE_LENGTH_HERE"
+        sparkle:edSignature="…"
+        length="…"
     />
 </item>
 ```
 
-### EdDSA Key Setup (one-time)
-
-Generate a key pair with Sparkle's tool:
-
-```bash
-.build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework/Versions/B/bin/generate_keys
-```
-
-This stores the private key in your macOS Keychain and prints the public key. Save the public key — it goes into `DEV_ISLAND_EDDSA_PUBLIC_KEY` env var during packaging and into `SUPublicEDKey` in Info.plist.
-
-## Signing (future)
-
-When `DEV_ISLAND_SIGN_IDENTITY` is set, `package-app.sh` handles codesign + notarization automatically. At that point:
-
-1. Remove the "Installation Section" Gatekeeper instructions from future release notes.
-2. Add `--verify` step to the checklist.
-
-See [packaging.md](packaging.md) for signing details.
+The feed starts empty: upstream's 48 entries pointed at upstream DMGs signed
+with upstream's key, and keeping them would have auto-updated Dev Island users
+onto the upstream app. See [fork-sync.md](fork-sync.md).

@@ -22,14 +22,15 @@ judgement on a sync:**
 | `README.md`, `README.zh-CN.md` | restore | Fork attribution, no Homebrew cask, no fork-owned community channels |
 | `appcast.xml` | restore | Reset to an empty feed, not rebranded |
 | `scripts/package-app.sh` | re-apply | Sparkle keys emitted conditionally instead of hardcoded; `AppliMacVincentGithub` as the default notary profile |
-| `.github/workflows/release.yml` | re-apply | Homebrew tap step disabled; Sparkle public key passed from a repo variable + the key-pair consistency guard |
+| `.github/workflows/release.yml`, `.github/workflows/notary-preflight.yml` | delete | Upstream releases from CI; this fork releases locally. A merge will keep resurrecting both — delete them again |
+| `scripts/release.sh` | keep | Fork-only. Upstream has no equivalent, so the merge leaves it alone |
 | `scripts/generate_brand_icons.py` | re-apply | Dead `render_app_icon()` removed — upstream still has it |
 | `.github/workflows/ci.yml` | re-apply | Extra `rebrand.sh --check` guard step |
 | `scripts/generate-v6-appicon.swift` | re-apply | Fork icon palette — violet pair, upstream's geometry |
 | `Assets/Brand/**` | regenerate | Binaries derived from the renderer above |
 | `scripts/rebrand.sh`, `docs/fork-sync.md` | untouched | They *are* the rebrand, and upstream does not have them — the merge leaves them alone |
 
-The three buckets need different handling, and the sync commands below follow them:
+Each bucket is handled differently, and the sync commands below follow them:
 
 - **restore** — upstream's version is meaningless here. Take the fork's wholesale.
 - **re-apply** — upstream's changes matter and the fork's edit is surgical. Read the diff, keep
@@ -37,6 +38,10 @@ The three buckets need different handling, and the sync commands below follow th
 - **regenerate** — do *not* restore these. Re-run the generators. Restoring would bring back
   `DevIsland.icns` while the merged tree still carries upstream's `OpenIsland.icns`, leaving both
   until `rebrand.sh` untangles it; regenerating sidesteps that entirely.
+- **delete** — upstream keeps re-adding these; delete them after every merge. They are not
+  disabled-in-place because a disabled workflow still invites someone to re-enable it.
+- **keep** / **untouched** — fork-only files upstream has no version of. The merge cannot touch
+  them; they are listed so nobody assumes they were forgotten.
 
 ## Syncing
 
@@ -59,13 +64,13 @@ git checkout HEAD -- README.md README.zh-CN.md appcast.xml
 # 3. re-apply — check each fork edit survived the merge, re-apply only what is missing.
 grep -q 'DEV_ISLAND_EDDSA_PUBLIC_KEY' scripts/package-app.sh              || echo 'MISSING: conditional Sparkle keys'
 grep -q 'AppliMacVincentGithub'       scripts/package-app.sh              || echo 'MISSING: default notary profile'
-grep -q 'DEV_ISLAND_NOTARY_PROFILE'   .github/workflows/release.yml       || echo 'MISSING: CI neutralisation of the notary profile'
-grep -q 'if: false'                   .github/workflows/release.yml       || echo 'MISSING: Homebrew tap disabled'
-grep -q 'DEV_ISLAND_EDDSA_PUBLIC_KEY' .github/workflows/release.yml       || echo 'MISSING: Sparkle public key wiring + guard'
+test ! -e .github/workflows/release.yml          || echo 'RESURRECTED: CI release workflow is back — delete it'
+test ! -e .github/workflows/notary-preflight.yml || echo 'RESURRECTED: notary preflight is back — delete it'
+test -x scripts/release.sh                       || echo 'MISSING: local release script'
 grep -q 'rebrand.sh --check'          .github/workflows/ci.yml            || echo 'MISSING: rebrand guard step'
 grep -q '0xED/255.0'                  scripts/generate-v6-appicon.swift   || echo 'MISSING: fork icon palette'
 grep -q 'app icon is NOT rendered here' scripts/generate_brand_icons.py   || echo 'MISSING: dead render_app_icon() came back'
-git diff HEAD -- scripts/package-app.sh .github/workflows/release.yml .github/workflows/ci.yml \
+git diff HEAD -- scripts/package-app.sh .github/workflows/ci.yml \
                  scripts/generate-v6-appicon.swift scripts/generate_brand_icons.py
 
 # 4. regenerate — after the renderer's palette is back in place.
@@ -167,16 +172,18 @@ Three wires into upstream infrastructure had to be cut, and must stay cut:
   fork's builds nor validate anything served from here.
 - **`appcast.xml`** was reset to an empty feed. Its 48 entries pointed at upstream DMGs and carried
   upstream EdDSA signatures.
-- **The Homebrew tap job** in `.github/workflows/release.yml` is `if: false`. It opened and
-  self-merged a PR against `Octane0411/homebrew-tap`, which is upstream's tap.
+- **The whole CI release pipeline** is gone, `release.yml` and `notary-preflight.yml` with it. It
+  carried a Homebrew job that opened and self-merged a PR against `Octane0411/homebrew-tap` —
+  upstream's tap — and it required the Developer ID certificate, its password, an app-specific
+  password and the Sparkle private key as repository secrets. This fork releases locally instead,
+  from the keychain: `scripts/release.sh`. **The repository has no secrets at all**, which is also
+  the simplest way to be sure none of them point at upstream.
 
 ### Before the first release
 
-1. Generate a keypair with Sparkle's `generate_keys`.
-2. Public half → `DEV_ISLAND_EDDSA_PUBLIC_KEY` at package time.
-3. Private half → `SPARKLE_EDDSA_KEY` repository secret.
-4. Sign under `Developer ID Application: Vincent LAURIAT (KFLACS69T9)`, notarize with the
-   `AppliMacVincentGithub` keychain profile.
+See [release-signing.md](release-signing.md). In short: `generate_keys --account DevIsland` (the
+account flag is not optional — without it Sparkle uses a global account shared with every other
+app on the machine), pin the public half in `scripts/release.sh`, back the private half up.
 
 ## The dev app
 
