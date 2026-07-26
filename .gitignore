@@ -21,6 +21,20 @@ Package.resolved
 *.zip
 release/release-notes-*.md
 
+# Generated brand assets. Every consumer regenerates them before use (scripts/package-app.sh,
+# scripts/launch-dev-app.sh both run the generators first), so tracking them bought nothing and
+# cost a dirty tree on every build: Pillow writes byte-different PNGs across encoder versions,
+# and scripts/release.sh refuses to run on a dirty tree. Listed by path, never as bare globs —
+# `*.png` here would swallow app-icon-v6.png and Source/logo.png, the hand-made inputs the
+# generators read from. See docs/fork-sync.md: upstream tracks these, so a merge re-adds them.
+Assets/Brand/AppIcon.appiconset/
+Assets/Brand/DevIsland.iconset/
+Assets/Brand/Internal/
+Assets/Brand/DevIsland.icns
+Assets/Brand/dmg-background.png
+Assets/Brand/dmg-background@2x.png
+Assets/Brand/scout-app-icon-master.svg
+
 # Local tooling artifacts
 .venv/
 .claude/
