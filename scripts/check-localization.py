@@ -21,7 +21,16 @@ import pathlib
 import re
 import sys
 
-RESOURCES = pathlib.Path(__file__).resolve().parent.parent / "Sources/DevIslandApp/Resources"
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+# Every directory holding a set of sibling <lang>.lproj bundles. The macOS app resolves
+# these through LanguageManager; the two Xcode targets go through NSLocalizedString and
+# PBXVariantGroup. Different plumbing, identical failure modes, so one checker covers both.
+RESOURCE_ROOTS = [
+    ROOT / "Sources/DevIslandApp/Resources",
+    ROOT / "ios/DevIslandMobile",
+    ROOT / "ios/DevIslandWatch",
+]
 REFERENCE = "en"
 
 # "key" = "value";  — values may contain escaped quotes.
@@ -43,20 +52,21 @@ def specifiers(value):
     return SPECIFIER.findall(value)
 
 
-def main():
-    bundles = sorted(p.name[: -len(".lproj")] for p in RESOURCES.glob("*.lproj"))
+def check(resources):
+    bundles = sorted(p.name[: -len(".lproj")] for p in resources.glob("*.lproj"))
+    print(f"\n{resources.relative_to(ROOT)}")
     if REFERENCE not in bundles:
-        print(f"FAIL: no {REFERENCE}.lproj in {RESOURCES}")
+        print(f"FAIL: no {REFERENCE}.lproj here")
         return 1
 
-    ref = parse(RESOURCES / f"{REFERENCE}.lproj/Localizable.strings")
-    print(f"reference {REFERENCE}.lproj: {len(ref)} keys")
+    ref = parse(resources / f"{REFERENCE}.lproj/Localizable.strings")
+    print(f"  ref {REFERENCE}.lproj: {len(ref)} keys")
 
     failures = 0
     for name in bundles:
         if name == REFERENCE:
             continue
-        other = parse(RESOURCES / f"{name}.lproj/Localizable.strings")
+        other = parse(resources / f"{name}.lproj/Localizable.strings")
 
         missing = sorted(set(ref) - set(other))
         extra = sorted(set(other) - set(ref))
@@ -67,7 +77,7 @@ def main():
         ]
 
         status = "ok" if not (missing or extra or drift) else "FAIL"
-        print(f"{status:>4}  {name}.lproj: {len(other)} keys")
+        print(f"  {status:>4} {name}.lproj: {len(other)} keys")
         for k in missing:
             print(f"        missing key: {k}")
         for k in extra:
@@ -76,6 +86,11 @@ def main():
             print(f"        specifier drift on {k}: {REFERENCE}={want} {name}={got}")
         failures += bool(missing or extra or drift)
 
+    return failures
+
+
+def main():
+    failures = sum(check(r) for r in RESOURCE_ROOTS)
     if failures:
         print(f"\n{failures} bundle(s) out of sync")
         return 1

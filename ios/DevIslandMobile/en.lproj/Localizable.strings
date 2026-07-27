@@ -1,0 +1,84 @@
+/* Common */
+"common.cancel" = "Cancel";
+
+/* Connection */
+"connection.connect" = "Connect";
+"connection.state.disconnected" = "Not connected";
+"connection.state.discovering" = "Searching…";
+"connection.state.paired" = "Paired, connecting…";
+"connection.state.connected" = "Connected";
+"connection.badge.connected" = "Connected";
+"connection.badge.connecting" = "Connecting";
+"connection.badge.searching" = "Searching";
+"connection.badge.offline" = "Offline";
+"connection.error.wifiLost" = "Wi-Fi lost — waiting for the network to come back…";
+"connection.error.reconnecting" = "Connection dropped, reconnecting…";
+
+/* Date grouping */
+"date.today" = "Today";
+"date.yesterday" = "Yesterday";
+
+/* Event list */
+"events.empty.title" = "No events yet";
+"events.empty.message" = "Events appear here when an AI agent needs permission, asks a question, or finishes a task.";
+"event.resolved.badge" = "Handled";
+
+/* Event detail */
+"event.detail.title" = "Event Details";
+"event.type.permission" = "Permission Request";
+"event.type.question" = "Question";
+"event.type.completion" = "Task Complete";
+"event.field.action" = "Action";
+"event.field.summary" = "Summary";
+"event.field.workingDirectory" = "Working Directory";
+"event.field.availableActions" = "Available actions";
+"event.field.resolvedAt" = "Handled";
+"event.field.timestamp" = "Time";
+"event.section.options" = "Options";
+"event.section.completionSummary" = "Completion Summary";
+"event.section.actions" = "Actions";
+"event.section.resolution" = "Outcome";
+"event.section.metadata" = "Details";
+
+/* Pairing */
+"pairing.title" = "Pair a Mac";
+"pairing.searching" = "Searching for Macs on the local network…";
+"pairing.section.found" = "Macs found";
+"pairing.notFound.title" = "No Mac found";
+"pairing.notFound.message" = "Make sure Dev Island is running on your Mac, and that the Mac and the iPhone are on the same Wi-Fi network.";
+"pairing.retry" = "Search again";
+"pairing.codePrompt" = "Enter the 4-digit pairing code shown on your Mac";
+"pairing.submit" = "Pair";
+"pairing.chooseAnother" = "Choose another Mac";
+
+/* Pairing - manual entry */
+"pairing.manual.entry" = "Enter an IP address manually";
+"pairing.manual.title" = "Manual Connection";
+"pairing.manual.host" = "IP address";
+"pairing.manual.port" = "Port";
+"pairing.manual.code" = "4-digit code";
+"pairing.manual.footer" = "When Bonjour cannot discover the Mac (personal hotspot, AP isolation), enter its IP address and port by hand.";
+"pairing.manual.submit" = "Connect and pair";
+"pairing.manual.invalidPort" = "Invalid port";
+
+/* Pairing - errors */
+"pairing.error.invalidCode" = "Wrong pairing code — check it and try again";
+"pairing.error.codeExpired" = "The pairing code expired. Refresh it on your Mac and enter the new one.";
+"pairing.error.invalidResponse" = "Unexpected server response";
+"pairing.error.serverError" = "Server error (%lld)";
+"pairing.error.resolutionFailed" = "Could not resolve the Mac address";
+"pairing.error.notConnected" = "Not connected to a Mac";
+"pairing.error.expired" = "Pairing expired — please pair again";
+
+/* Settings */
+"settings.title" = "Settings";
+"settings.section.notificationTypes" = "Notification Types";
+"settings.section.sound" = "Sound";
+"settings.section.pairedDevice" = "Paired Device";
+"settings.notify.completions" = "Completions";
+"settings.silent.title" = "Silent mode";
+"settings.silent.note" = "Completion notifications make no sound";
+"settings.pairedAt" = "Paired on %@";
+"settings.notPaired" = "Not paired";
+"settings.disconnect" = "Disconnect and unpair";
+"settings.rescan" = "Search for Macs again";

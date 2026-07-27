@@ -38,7 +38,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
         let response = WatchResponse.resolution(requestID: requestID, action: action)
         guard let data = try? JSONEncoder().encode(response) else {
             logger.error("Failed to encode WatchResponse for \(requestID)")
-            lastError = "编码响应失败"
+            lastError = NSLocalizedString("watch.error.encoding", comment: "Shown on the watch when a reply cannot be encoded")
             return
         }
         let payload: [String: Any] = ["payload": data]

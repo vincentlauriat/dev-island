@@ -1,0 +1,7 @@
+/* Watch - idle state */
+"watch.ready.title" = "All clear";
+"watch.phone.connected" = "iPhone connected";
+"watch.phone.disconnected" = "iPhone not connected";
+
+/* Watch - errors */
+"watch.error.encoding" = "Failed to encode the response";

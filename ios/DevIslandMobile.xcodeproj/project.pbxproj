@@ -30,6 +30,8 @@
 		IC000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = IC000004 /* Assets.xcassets */; };
 		PV000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = PV000002 /* PrivacyInfo.xcprivacy */; };
 		PV000003 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = PV000004 /* PrivacyInfo.xcprivacy */; };
+		LB000001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = LS000001 /* Localizable.strings */; };
+		LB000002 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = LS000002 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +83,12 @@
 		IC000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		PV000002 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		PV000004 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		LF000001 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		LF000002 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = "fr.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		LF000003 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		LF000011 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		LF000012 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = "fr.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		LF000013 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +127,7 @@
 				AB000008 /* Info.plist */,
 				IC000002 /* Assets.xcassets */,
 				PV000002 /* PrivacyInfo.xcprivacy */,
+				LS000001 /* Localizable.strings */,
 				AE000003 /* Network */,
 				AE000004 /* Views */,
 				AE000005 /* Models */,
@@ -191,6 +200,7 @@
 				WA000005 /* EventCardView.swift */,
 				IC000004 /* Assets.xcassets */,
 				PV000004 /* PrivacyInfo.xcprivacy */,
+				LS000002 /* Localizable.strings */,
 			);
 			path = DevIslandWatch;
 			sourceTree = "<group>";
@@ -254,11 +264,12 @@
 			};
 			buildConfigurationList = B1000002 /* Build configuration list for PBXProject "DevIslandMobile" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = "zh-Hans";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				"zh-Hans",
 				en,
+				fr,
+				"zh-Hans",
 				Base,
 			);
 			mainGroup = AE000001;
@@ -279,6 +290,7 @@
 			files = (
 				IC000001 /* Assets.xcassets in Resources */,
 				PV000001 /* PrivacyInfo.xcprivacy in Resources */,
+				LB000001 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +300,7 @@
 			files = (
 				IC000003 /* Assets.xcassets in Resources */,
 				PV000003 /* PrivacyInfo.xcprivacy in Resources */,
+				LB000002 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,6 +348,29 @@
 			targetProxy = WP000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		LS000001 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				LF000001 /* en */,
+				LF000002 /* fr */,
+				LF000003 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		LS000002 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				LF000011 /* en */,
+				LF000012 /* fr */,
+				LF000013 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		B3000001 /* Debug */ = {

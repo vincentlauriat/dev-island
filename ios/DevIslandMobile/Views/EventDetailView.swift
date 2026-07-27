@@ -20,7 +20,7 @@ struct EventDetailView: View {
             metadataSection
         }
         .listStyle(.insetGrouped)
-        .navigationTitle("事件详情")
+        .navigationTitle("event.detail.title")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -59,7 +59,7 @@ struct EventDetailView: View {
                         .background(event.iconColor.opacity(0.1), in: Capsule())
 
                     if event.isResolved {
-                        Text("已处理")
+                        Text("event.resolved.badge")
                             .font(.caption)
                             .foregroundStyle(.green)
                             .padding(.horizontal, 8)
@@ -79,14 +79,14 @@ struct EventDetailView: View {
     private var detailSection: some View {
         switch event.kind {
         case let .permissionRequested(title, summary, _, primaryAction, secondaryAction):
-            Section("权限请求") {
-                LabeledContent("操作", value: title)
-                LabeledContent("摘要", value: summary)
+            Section("event.type.permission") {
+                LabeledContent("event.field.action", value: title)
+                LabeledContent("event.field.summary", value: summary)
                 if let dir = event.workingDirectory {
-                    LabeledContent("工作目录", value: dir)
+                    LabeledContent("event.field.workingDirectory", value: dir)
                 }
                 HStack {
-                    Text("可选操作")
+                    Text("event.field.availableActions")
                     Spacer()
                     Text(primaryAction)
                         .foregroundStyle(.green)
@@ -98,12 +98,12 @@ struct EventDetailView: View {
             }
 
         case let .questionAsked(title, options, _):
-            Section("问题") {
+            Section("event.type.question") {
                 Text(title)
                     .font(.body)
             }
             if !options.isEmpty {
-                Section("选项") {
+                Section("event.section.options") {
                     ForEach(Array(options.enumerated()), id: \.offset) { _, option in
                         Text(option)
                     }
@@ -111,7 +111,7 @@ struct EventDetailView: View {
             }
 
         case let .sessionCompleted(summary):
-            Section("完成摘要") {
+            Section("event.section.completionSummary") {
                 Text(summary)
                     .font(.body)
             }
@@ -150,7 +150,7 @@ struct EventDetailView: View {
                 EmptyView()
             }
         } header: {
-            Text("操作")
+            Text("event.section.actions")
         }
     }
 
@@ -158,15 +158,17 @@ struct EventDetailView: View {
 
     @ViewBuilder
     private var resolutionSection: some View {
-        Section("处理结果") {
+        Section("event.section.resolution") {
             if let action = event.resolvedAction {
-                LabeledContent("操作", value: action)
+                LabeledContent("event.field.action", value: action)
             }
             if let resolvedAt = event.resolvedAt {
-                LabeledContent("处理时间") {
-                    Text(resolvedAt, style: .relative)
-                        .foregroundStyle(.secondary)
-                    + Text(" 前")
+                LabeledContent("event.field.resolvedAt") {
+                    // style: .relative renders a bare duration ("3 minutes"), which is why
+                    // the original appended a separate "前". .relative(presentation: .named)
+                    // emits the whole localized phrase instead — "3 minutes ago",
+                    // "il y a 3 minutes", "3分钟前" — so no suffix has to be glued on.
+                    Text(resolvedAt, format: .relative(presentation: .named))
                         .foregroundStyle(.secondary)
                 }
             }
@@ -177,14 +179,14 @@ struct EventDetailView: View {
 
     @ViewBuilder
     private var metadataSection: some View {
-        Section("详细信息") {
+        Section("event.section.metadata") {
             LabeledContent("Session ID") {
                 Text(event.sessionID)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
-            LabeledContent("时间") {
+            LabeledContent("event.field.timestamp") {
                 Text(event.timestamp, format: .dateTime)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -196,9 +198,9 @@ struct EventDetailView: View {
 
     private var eventTypeLabel: String {
         switch event.kind {
-        case .permissionRequested: return "权限请求"
-        case .questionAsked: return "问题"
-        case .sessionCompleted: return "任务完成"
+        case .permissionRequested: return NSLocalizedString("event.type.permission", comment: "")
+        case .questionAsked: return NSLocalizedString("event.type.question", comment: "")
+        case .sessionCompleted: return NSLocalizedString("event.type.completion", comment: "")
         }
     }
 

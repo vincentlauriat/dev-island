@@ -1,0 +1,7 @@
+/* Watch - idle state */
+"watch.ready.title" = "一切就绪";
+"watch.phone.connected" = "iPhone 已连接";
+"watch.phone.disconnected" = "iPhone 未连接";
+
+/* Watch - errors */
+"watch.error.encoding" = "编码响应失败";
