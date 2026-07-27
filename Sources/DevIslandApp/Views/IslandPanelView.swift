@@ -587,6 +587,7 @@ struct IslandPanelView: View {
                     presentation: .notification,
                     sideInset: sessionListSideInset,
                     lang: model.lang,
+                    typography: model.islandTypography,
                     onApprove: { model.approvePermission(for: session.id, action: $0) },
                     onAnswer: { model.answerQuestion(for: session.id, answer: $0) },
                     onReply: TerminalTextSender.canReply(to: session, enabled: model.completionReplyEnabled)
@@ -628,6 +629,7 @@ struct IslandPanelView: View {
                                 isInteractive: model.notchStatus == .opened,
                                 sideInset: sessionListSideInset,
                                 lang: model.lang,
+                                typography: model.islandTypography,
                                 onApprove: { model.approvePermission(for: session.id, action: $0) },
                                 onAnswer: { model.answerQuestion(for: session.id, answer: $0) },
                                 onReply: TerminalTextSender.canReply(to: session, enabled: model.completionReplyEnabled)
@@ -678,6 +680,7 @@ struct IslandPanelView: View {
                         isInteractive: model.notchStatus == .opened,
                         sideInset: sessionListSideInset,
                         lang: model.lang,
+                        typography: model.islandTypography,
                         onApprove: { model.approvePermission(for: session.id, action: $0) },
                         onAnswer: { model.answerQuestion(for: session.id, answer: $0) },
                         onReply: TerminalTextSender.canReply(to: session, enabled: model.completionReplyEnabled)
@@ -1189,6 +1192,7 @@ private struct IslandSessionRow: View {
     var presentation: IslandSessionRowPresentation = .list
     var sideInset: CGFloat = 16
     var lang: LanguageManager = .shared
+    var typography = IslandTypographyPreferences()
     var onApprove: ((ApprovalAction) -> Void)?
     var onAnswer: ((QuestionPromptResponse) -> Void)?
     var onReply: ((String) -> Void)?
@@ -1276,7 +1280,7 @@ private struct IslandSessionRow: View {
                 if showsDetail,
                    let promptLine = summaryPromptLineText {
                     Text(promptLine)
-                        .font(.system(size: 11.2, weight: .medium))
+                        .font(typography.font(.body, sizeOffset: 0.2))
                         .foregroundStyle(summaryPromptColor(for: presence))
                         .lineLimit(1)
                         .truncationMode(.tail)
@@ -1294,7 +1298,7 @@ private struct IslandSessionRow: View {
                     sideBadge(terminalBadge)
                 }
                 Text(session.spotlightAgeBadge)
-                    .font(.system(size: 10.5, weight: .medium, design: .monospaced))
+                    .font(typography.font(.badge))
                     .foregroundStyle(summaryAgeColor(for: presence))
                     .frame(minWidth: 30, alignment: .trailing)
                 detailToggleButton(isOpen: showsDetail)
@@ -1314,7 +1318,7 @@ private struct IslandSessionRow: View {
         if !shouldShowEmbeddedDetailBody,
            let activityLine = session.spotlightActivityLineText ?? expandedActivityLineText {
             Text(activityLine)
-                .font(.system(size: 11, weight: .medium))
+                .font(typography.font(.body))
                 .foregroundStyle(activityColor(for: presence).opacity(0.94))
                 .lineLimit(2)
                 .padding(.leading, detailLeadingInset)
@@ -1327,9 +1331,9 @@ private struct IslandSessionRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 5) {
                     Image(systemName: "arrow.triangle.branch")
-                        .font(.system(size: 9, weight: .medium))
+                        .font(typography.font(.body, sizeOffset: -2))
                     Text(lang.t("subagents.title", subagents.count))
-                        .font(.system(size: 10.5, weight: .medium))
+                        .font(typography.font(.body, sizeOffset: -0.5))
                 }
                 .foregroundStyle(.cyan.opacity(0.8))
 
@@ -1341,24 +1345,24 @@ private struct IslandSessionRow: View {
                                 : IslandDesignPalette.Status.running)
                             .frame(width: 6, height: 6)
                         Text(sub.agentType ?? sub.agentID)
-                            .font(.system(size: 11, weight: .medium))
+                            .font(typography.font(.body))
                             .foregroundStyle(.white.opacity(0.8))
                             .lineLimit(1)
                         if let desc = sub.taskDescription {
                             Text("(\(desc))")
-                                .font(.system(size: 10.5))
+                                .font(typography.font(.body, sizeOffset: -0.5, weight: .regular))
                                 .foregroundStyle(.white.opacity(0.5))
                                 .lineLimit(1)
                         }
                         Spacer(minLength: 0)
                         if sub.summary != nil {
                             Text(lang.t("subagents.completed"))
-                                .font(.system(size: 10, weight: .medium))
+                                .font(typography.font(.body, sizeOffset: -1))
                                 .foregroundStyle(.white.opacity(0.4))
                         } else if let started = sub.startedAt {
                             TimelineView(.periodic(from: .now, by: 1)) { timeline in
                                 Text(subagentElapsed(since: started, at: timeline.date))
-                                    .font(.system(size: 10, weight: .medium))
+                                    .font(typography.font(.body, sizeOffset: -1))
                                     .foregroundStyle(.white.opacity(0.4))
                             }
                         }
@@ -1374,13 +1378,13 @@ private struct IslandSessionRow: View {
            !tasks.isEmpty {
             VStack(alignment: .leading, spacing: 3) {
                 Text(taskSummary(tasks))
-                    .font(.system(size: 10.5, weight: .medium))
+                    .font(typography.font(.body, sizeOffset: -0.5))
                     .foregroundStyle(.white.opacity(0.45))
                 ForEach(tasks) { task in
                     HStack(spacing: 5) {
                         taskStatusIcon(task.status)
                         Text(task.title)
-                            .font(.system(size: 10.5, weight: .medium))
+                            .font(typography.font(.body, sizeOffset: -0.5))
                             .foregroundStyle(task.status == .completed
                                 ? .white.opacity(0.4)
                                 : .white.opacity(0.7))
@@ -1398,7 +1402,7 @@ private struct IslandSessionRow: View {
     private var agentBadge: some View {
         let tint = Color(hex: session.tool.brandColorHex) ?? V6Palette.paper
         return Text(agentBadgeTitle)
-            .font(.system(size: 10.5, weight: .semibold, design: .monospaced))
+            .font(typography.font(.badge, weight: .semibold))
             .foregroundStyle(tint.opacity(notificationChromeOpacity))
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
@@ -1411,7 +1415,7 @@ private struct IslandSessionRow: View {
             // 8.5 rather than the 10.5 the rest of the badge row uses: the terminal name is the
             // longest string in that row and was crowding it. Applies to the SSH badge too — the
             // two share this component, and sizing sibling capsules differently reads as a bug.
-            .font(.system(size: 8.5, weight: .medium, design: .monospaced))
+            .font(typography.font(.badge, sizeOffset: -2))
             .foregroundStyle(V6Palette.paper.opacity(presentation == .notification ? 0.52 : 0.7))
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
@@ -1514,7 +1518,12 @@ private struct IslandSessionRow: View {
     }
 
     private var summaryTitleFont: Font {
-        .system(size: presentation == .notification ? 13.2 : (isActionable ? 13.8 : 13.2), weight: .semibold)
+        // A row that needs an answer gets a slightly larger headline so it wins
+        // the scan against the rows around it. The notification presentation
+        // shows one card at a time, so it has nothing to win against and keeps
+        // the base size.
+        let isEmphasised = presentation != .notification && isActionable
+        return typography.font(.title, sizeOffset: isEmphasised ? 0.6 : 0)
     }
 
     private func summaryPromptColor(for presence: IslandSessionPresence) -> Color {
@@ -1611,7 +1620,7 @@ private struct IslandSessionRow: View {
         VStack(alignment: .leading, spacing: 0) {
             if let runningDetailText {
                 Text(runningDetailText)
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .font(typography.font(.code, sizeOffset: 0.5))
                     .foregroundStyle(.white.opacity(0.82))
                     .lineLimit(3)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1637,19 +1646,19 @@ private struct IslandSessionRow: View {
     private var approvalActionBody: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(lang.t("approval.toolPermissionRequested"))
-                .font(.system(size: 12.5, weight: .semibold))
+                .font(typography.font(.title, sizeOffset: -0.7))
                 .foregroundStyle(V6Palette.paper.opacity(0.86))
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(commandPreviewText)
-                    .font(.system(size: 11.5, weight: .semibold, design: .monospaced))
+                    .font(typography.font(.code))
                     .foregroundStyle(V6Palette.paper.opacity(0.78))
                     .fixedSize(horizontal: false, vertical: true)
 
                 if let path = session.permissionRequest?.affectedPath.trimmedForNotificationCard,
                    !path.isEmpty {
                     Text(path)
-                        .font(.system(size: 10.5, weight: .medium))
+                        .font(typography.font(.body, sizeOffset: -0.5))
                         .foregroundStyle(V6Palette.paper.opacity(0.42))
                         .lineLimit(1)
                 }
@@ -1690,6 +1699,7 @@ private struct IslandSessionRow: View {
         StructuredQuestionPromptView(
             prompt: session.questionPrompt,
             lang: lang,
+            typography: typography,
             onAnswer: { onAnswer?($0) }
         )
     }
@@ -1701,7 +1711,7 @@ private struct IslandSessionRow: View {
             if !completionMessageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 AutoHeightScrollView(maxHeight: 160) {
                     Markdown(completionMessageText)
-                        .markdownTheme(.completionCard)
+                        .markdownTheme(.completionCard(typography))
                         .frame(maxWidth: .infinity, alignment: .topLeading)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 9)
@@ -2043,6 +2053,7 @@ private struct IslandSessionRow: View {
 private struct StructuredQuestionPromptView: View {
     let prompt: QuestionPrompt?
     var lang: LanguageManager = .shared
+    var typography = IslandTypographyPreferences()
     let onAnswer: (QuestionPromptResponse) -> Void
 
     @State private var selections: [String: Set<String>] = [:]
@@ -2054,7 +2065,7 @@ private struct StructuredQuestionPromptView: View {
         VStack(alignment: .leading, spacing: 10) {
             if showsPromptTitle {
                 Text(promptTitle)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(typography.font(.title, sizeOffset: -0.2))
                     .foregroundStyle(IslandDesignPalette.Status.waitingForAnswer)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -2098,12 +2109,12 @@ private struct StructuredQuestionPromptView: View {
         VStack(alignment: .leading, spacing: 6) {
             if structuredQuestions.count > 1 {
                 Text(question.header)
-                    .font(.system(size: 10, weight: .bold))
+                    .font(typography.font(.body, sizeOffset: -1, weight: .bold))
                     .foregroundStyle(.white.opacity(0.5))
             }
 
             Text(question.question)
-                .font(.system(size: 12, weight: .medium))
+                .font(typography.font(.body, sizeOffset: 1))
                 .foregroundStyle(.white.opacity(0.88))
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -2133,7 +2144,7 @@ private struct StructuredQuestionPromptView: View {
             } label: {
                 HStack(spacing: 10) {
                     Text("\(optionIndex + 1)")
-                        .font(.system(size: 10.5, weight: .semibold, design: .monospaced))
+                        .font(typography.font(.badge, weight: .semibold))
                         .foregroundStyle(isSelected ? .black.opacity(0.82) : V6Palette.paper.opacity(0.42))
                         .frame(width: 22, height: 20)
                         .background(
@@ -2147,12 +2158,12 @@ private struct StructuredQuestionPromptView: View {
 
                     VStack(alignment: .leading, spacing: 1) {
                         Text(option.label)
-                            .font(.system(size: 12.2, weight: .medium))
+                            .font(typography.font(.body, sizeOffset: 1.2))
                             .foregroundStyle(.white.opacity(isSelected ? 1 : 0.78))
 
                         if !option.description.isEmpty {
                             Text(option.description)
-                                .font(.system(size: 10.5))
+                                .font(typography.font(.body, sizeOffset: -0.5, weight: .regular))
                                 .foregroundStyle(.white.opacity(isHovered || isSelected ? 0.48 : 0.38))
                                 .lineLimit(1)
                         }
@@ -2162,7 +2173,7 @@ private struct StructuredQuestionPromptView: View {
 
                     if isSelected {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(typography.font(.body, weight: .bold))
                             .foregroundStyle(IslandDesignPalette.Status.completed)
                     }
                 }
@@ -2619,11 +2630,18 @@ private struct IslandActionButtonStyle: ButtonStyle {
 // MARK: - MarkdownUI Theme
 
 extension MarkdownUI.Theme {
-    @MainActor static let completionCard = Theme()
+    /// The completion message is the one piece of card text MarkdownUI renders,
+    /// so it never passes through `.font()` and has to pick the typography roles
+    /// up here instead. Prose follows `.body`, fenced and inline code follow
+    /// `.code`, each keeping the offset the theme shipped with.
+    @MainActor static func completionCard(_ typography: IslandTypographyPreferences) -> Theme {
+        let bodySize = max(4, typography.size(.body) + 2.5)
+        let codeSize = max(4, typography.size(.code) + 1)
+        return Theme()
         .text {
             ForegroundColor(.white.opacity(0.88))
-            FontSize(13.5)
-            FontWeight(.medium)
+            FontSize(bodySize)
+            FontWeight(typography.weight(.body).fontWeight)
         }
         .link {
             ForegroundColor(.blue)
@@ -2633,7 +2651,7 @@ extension MarkdownUI.Theme {
         }
         .code {
             FontFamilyVariant(.monospaced)
-            FontSize(12.5)
+            FontSize(codeSize)
             ForegroundColor(.white.opacity(0.88))
             BackgroundColor(.white.opacity(0.08))
         }
@@ -2641,7 +2659,7 @@ extension MarkdownUI.Theme {
             configuration.label
                 .markdownTextStyle {
                     FontFamilyVariant(.monospaced)
-                    FontSize(12.5)
+                    FontSize(codeSize)
                     ForegroundColor(.white.opacity(0.88))
                 }
                 .padding(10)
@@ -2713,6 +2731,7 @@ extension MarkdownUI.Theme {
                 .padding(.horizontal, 12)
                 .relativeLineSpacing(.em(0.25))
         }
+    }
 }
 
 private struct DismissButton: View {
