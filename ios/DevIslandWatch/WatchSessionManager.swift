@@ -38,7 +38,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
         let response = WatchResponse.resolution(requestID: requestID, action: action)
         guard let data = try? JSONEncoder().encode(response) else {
             logger.error("Failed to encode WatchResponse for \(requestID)")
-            lastError = "编码响应失败"
+            lastError = NSLocalizedString("watch.error.encoding", comment: "Shown on the watch when a reply cannot be encoded")
             return
         }
         let payload: [String: Any] = ["payload": data]
@@ -140,7 +140,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
         let request = UNNotificationRequest(
             identifier: "watch-\(requestID)",
             content: content,
-            trigger: nil  // 立即触发
+            trigger: nil  // fire immediately
         )
         UNUserNotificationCenter.current().add(request) { error in
             if let error {
@@ -155,7 +155,7 @@ final class WatchSessionManager: NSObject, ObservableObject {
 extension WatchSessionManager: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-        // 即使 app 在前台也显示通知（确保震动）
+        // Show the notification even when the app is foregrounded, so the haptic still fires.
         [.sound, .banner]
     }
 
@@ -170,7 +170,7 @@ extension WatchSessionManager: UNUserNotificationCenterDelegate {
         case "DENY":
             resolve(requestID: requestID, action: "deny")
         case UNNotificationDefaultActionIdentifier:
-            // 用户点击了通知本体，打开 app 显示详情
+            // The user tapped the notification body — open the app on the detail view.
             break
         default:
             break

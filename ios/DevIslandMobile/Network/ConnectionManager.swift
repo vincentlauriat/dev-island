@@ -18,10 +18,10 @@ final class ConnectionManager: ObservableObject {
 
         var displayText: String {
             switch self {
-            case .disconnected: return "未连接"
-            case .discovering: return "搜索中..."
-            case .paired: return "已配对，连接中..."
-            case .connected: return "已连接"
+            case .disconnected: return NSLocalizedString("connection.state.disconnected", comment: "")
+            case .discovering: return NSLocalizedString("connection.state.discovering", comment: "")
+            case .paired: return NSLocalizedString("connection.state.paired", comment: "")
+            case .connected: return NSLocalizedString("connection.state.connected", comment: "")
             }
         }
 
@@ -168,7 +168,7 @@ final class ConnectionManager: ObservableObject {
                     self.sseClient = nil
                     if self.state == .connected {
                         self.state = .paired
-                        self.connectionError = "WiFi 断开，等待网络恢复..."
+                        self.connectionError = NSLocalizedString("connection.error.wifiLost", comment: "")
                     }
                 } else if !wasSatisfied && isSatisfied && self.savedToken != nil {
                     // WiFi restored — attempt reconnect via Bonjour
@@ -432,7 +432,7 @@ final class ConnectionManager: ObservableObject {
     private func handleSSEDisconnect() {
         guard state == .connected || state == .paired else { return }
         state = .paired
-        connectionError = "连接中断，正在重连..."
+        connectionError = NSLocalizedString("connection.error.reconnecting", comment: "")
         Self.logger.info("SSE disconnected, will attempt reconnect")
         scheduleReconnect()
     }
@@ -594,7 +594,7 @@ final class ConnectionManager: ObservableObject {
         reconnectTask = nil
         savedToken = nil
         state = .disconnected
-        connectionError = "配对已过期，请重新配对"
+        connectionError = NSLocalizedString("pairing.error.expired", comment: "")
     }
 }
 
@@ -611,13 +611,14 @@ enum PairingError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidCode: return "配对码错误，请检查后重试"
-        case .codeExpired: return "配对码已过期，请在 Mac 上刷新配对码后重新输入"
-        case .invalidResponse: return "服务器响应异常"
-        case let .serverError(code): return "服务器错误 (\(code))"
-        case .resolutionFailed: return "无法解析 Mac 地址"
-        case .notConnected: return "未连接到 Mac"
-        case .tokenExpired: return "配对已过期，请重新配对"
+        case .invalidCode: return NSLocalizedString("pairing.error.invalidCode", comment: "")
+        case .codeExpired: return NSLocalizedString("pairing.error.codeExpired", comment: "")
+        case .invalidResponse: return NSLocalizedString("pairing.error.invalidResponse", comment: "")
+        case let .serverError(code):
+            return String(format: NSLocalizedString("pairing.error.serverError", comment: "%lld is the HTTP status code"), code)
+        case .resolutionFailed: return NSLocalizedString("pairing.error.resolutionFailed", comment: "")
+        case .notConnected: return NSLocalizedString("pairing.error.notConnected", comment: "")
+        case .tokenExpired: return NSLocalizedString("pairing.error.expired", comment: "")
         }
     }
 }

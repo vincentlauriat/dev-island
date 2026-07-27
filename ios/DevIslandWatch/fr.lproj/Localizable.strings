@@ -1,0 +1,7 @@
+/* Watch - idle state */
+"watch.ready.title" = "Tout est prêt";
+"watch.phone.connected" = "iPhone connecté";
+"watch.phone.disconnected" = "iPhone non connecté";
+
+/* Watch - errors */
+"watch.error.encoding" = "Échec de l'encodage de la réponse";

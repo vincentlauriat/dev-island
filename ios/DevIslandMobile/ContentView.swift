@@ -81,7 +81,7 @@ struct ContentView: View {
     private var connectionActionButton: some View {
         switch connectionManager.state {
         case .disconnected:
-            Button("连接") {
+            Button("connection.connect") {
                 connectionManager.startDiscovery()
             }
             .buttonStyle(.borderedProminent)
@@ -111,11 +111,11 @@ struct ContentView: View {
                     .font(.system(size: 36))
                     .foregroundStyle(.tertiary)
 
-                Text("暂无事件")
+                Text("events.empty.title")
                     .font(.headline)
                     .foregroundStyle(.secondary)
 
-                Text("当 AI Agent 需要权限批准、回答问题或完成任务时，事件会显示在这里。")
+                Text("events.empty.message")
                     .font(.subheadline)
                     .foregroundStyle(.tertiary)
                     .multilineTextAlignment(.center)
@@ -159,7 +159,7 @@ struct ContentView: View {
                         .lineLimit(1)
 
                     if event.isResolved {
-                        Text("已处理")
+                        Text("event.resolved.badge")
                             .font(.caption2)
                             .foregroundStyle(.green)
                             .padding(.horizontal, 6)
@@ -238,14 +238,17 @@ struct ContentView: View {
         return sortedKeys.map { key in
             let label: String
             switch key {
-            case "today": label = "今天"
-            case "yesterday": label = "昨天"
+            case "today": label = NSLocalizedString("date.today", comment: "")
+            case "yesterday": label = NSLocalizedString("date.yesterday", comment: "")
             default:
                 let formatter = DateFormatter()
                 formatter.dateFormat = "yyyy-MM-dd"
                 if let date = formatter.date(from: key) {
                     let display = DateFormatter()
-                    display.dateFormat = "M月d日"
+                    // Locale-aware month/day order rather than a fixed pattern: "6 Jan" in
+                    // en-GB, "Jan 6" in en-US, "6 janv." in fr, "1月6日" in zh. The hardcoded
+                    // "M月d日" imposed the Chinese form on every language.
+                    display.setLocalizedDateFormatFromTemplate("MMMd")
                     label = display.string(from: date)
                 } else {
                     label = key

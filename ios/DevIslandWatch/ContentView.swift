@@ -23,10 +23,16 @@ struct ContentView: View {
                 .foregroundStyle(.blue)
                 .symbolEffect(.pulse, isActive: !sessionManager.isPhoneReachable)
 
-            Text("一切就绪")
+            Text("watch.ready.title")
                 .font(.headline)
 
-            Text(sessionManager.isPhoneReachable ? "iPhone 已连接" : "iPhone 未连接")
+            // Spelled out as LocalizedStringKey rather than a bare ternary of string
+            // literals: Text has both a LocalizedStringKey and a StringProtocol
+            // initialiser, and a ternary can resolve to the latter — which renders the
+            // key verbatim instead of localizing it.
+            Text(sessionManager.isPhoneReachable
+                 ? LocalizedStringKey("watch.phone.connected")
+                 : LocalizedStringKey("watch.phone.disconnected"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

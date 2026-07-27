@@ -1,0 +1,84 @@
+/* Common */
+"common.cancel" = "取消";
+
+/* Connection */
+"connection.connect" = "连接";
+"connection.state.disconnected" = "未连接";
+"connection.state.discovering" = "搜索中...";
+"connection.state.paired" = "已配对，连接中...";
+"connection.state.connected" = "已连接";
+"connection.badge.connected" = "已连接";
+"connection.badge.connecting" = "连接中";
+"connection.badge.searching" = "搜索中";
+"connection.badge.offline" = "离线";
+"connection.error.wifiLost" = "WiFi 断开，等待网络恢复...";
+"connection.error.reconnecting" = "连接中断，正在重连...";
+
+/* Date grouping */
+"date.today" = "今天";
+"date.yesterday" = "昨天";
+
+/* Event list */
+"events.empty.title" = "暂无事件";
+"events.empty.message" = "当 AI Agent 需要权限批准、回答问题或完成任务时，事件会显示在这里。";
+"event.resolved.badge" = "已处理";
+
+/* Event detail */
+"event.detail.title" = "事件详情";
+"event.type.permission" = "权限请求";
+"event.type.question" = "问题";
+"event.type.completion" = "任务完成";
+"event.field.action" = "操作";
+"event.field.summary" = "摘要";
+"event.field.workingDirectory" = "工作目录";
+"event.field.availableActions" = "可选操作";
+"event.field.resolvedAt" = "处理时间";
+"event.field.timestamp" = "时间";
+"event.section.options" = "选项";
+"event.section.completionSummary" = "完成摘要";
+"event.section.actions" = "操作";
+"event.section.resolution" = "处理结果";
+"event.section.metadata" = "详细信息";
+
+/* Pairing */
+"pairing.title" = "配对 Mac";
+"pairing.searching" = "正在搜索局域网中的 Mac...";
+"pairing.section.found" = "发现的 Mac";
+"pairing.notFound.title" = "未发现 Mac";
+"pairing.notFound.message" = "请确保 Mac 上的 Dev Island 正在运行，且 Mac 和 iPhone 在同一 WiFi 网络下。";
+"pairing.retry" = "重新搜索";
+"pairing.codePrompt" = "请输入 Mac 上显示的 4 位配对码";
+"pairing.submit" = "配对";
+"pairing.chooseAnother" = "选择其他 Mac";
+
+/* Pairing - manual entry */
+"pairing.manual.entry" = "手动输入 IP 地址";
+"pairing.manual.title" = "手动连接";
+"pairing.manual.host" = "IP 地址";
+"pairing.manual.port" = "端口";
+"pairing.manual.code" = "4 位配对码";
+"pairing.manual.footer" = "Bonjour 无法发现时（如热点、AP 隔离），可手动输入 Mac 的 IP 和端口。";
+"pairing.manual.submit" = "连接并配对";
+"pairing.manual.invalidPort" = "端口格式无效";
+
+/* Pairing - errors */
+"pairing.error.invalidCode" = "配对码错误，请检查后重试";
+"pairing.error.codeExpired" = "配对码已过期，请在 Mac 上刷新配对码后重新输入";
+"pairing.error.invalidResponse" = "服务器响应异常";
+"pairing.error.serverError" = "服务器错误 (%lld)";
+"pairing.error.resolutionFailed" = "无法解析 Mac 地址";
+"pairing.error.notConnected" = "未连接到 Mac";
+"pairing.error.expired" = "配对已过期，请重新配对";
+
+/* Settings */
+"settings.title" = "设置";
+"settings.section.notificationTypes" = "通知类型";
+"settings.section.sound" = "声音";
+"settings.section.pairedDevice" = "已配对设备";
+"settings.notify.completions" = "完成通知";
+"settings.silent.title" = "静默模式";
+"settings.silent.note" = "完成通知不发出声音";
+"settings.pairedAt" = "配对时间：%@";
+"settings.notPaired" = "未配对";
+"settings.disconnect" = "断开连接并取消配对";
+"settings.rescan" = "重新搜索 Mac";

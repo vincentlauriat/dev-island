@@ -5,7 +5,7 @@ enum WatchMessage: Codable, Sendable {
     case permissionRequest(PermissionPayload)
     case question(QuestionPayload)
     case sessionCompleted(CompletionPayload)
-    case resolved(requestID: String)  // Mac 侧已处理，通知 Watch 清理 UI
+    case resolved(requestID: String)  // Handled on the Mac side — tells the Watch to clear its UI
 
     struct PermissionPayload: Codable, Sendable {
         let requestID: String
