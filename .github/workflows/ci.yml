@@ -25,6 +25,13 @@ jobs:
       - name: Verify rebrand is fully applied
         run: bash scripts/rebrand.sh --check
 
+      # Key parity and printf format specifiers across every .lproj, for the macOS bundles
+      # and both Xcode targets. Neither swift build nor xcodebuild can see these failures: a
+      # missing key renders as the raw key at runtime, and a dropped or reordered %@ makes
+      # String(format:) read arguments that were never pushed.
+      - name: Verify localization bundles are in sync
+        run: python3 scripts/check-localization.py
+
       - name: Show Swift Version
         run: swift --version
 

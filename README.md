@@ -112,7 +112,7 @@ Think of it as an open-source [Vibe Island](https://vibeisland.app/) — **free,
 | Settings | Hook install/uninstall, usage dashboard |
 | Notification mode | Auto-height panel for permission requests and session events |
 | Notification sounds | Configurable system sounds, mute toggle |
-| i18n | English, Simplified Chinese |
+| i18n | English, French, Simplified Chinese, Traditional Chinese |
 | Session discovery | Auto-discover from local transcripts, persist across launches |
 | Auto-update | Sparkle-based automatic updates |
 | Signed & notarized | DMG packaging with Apple notarization |
@@ -282,7 +282,7 @@ Developers who already live in the terminal and want a better way to work with c
 - **Settings** — Hook install/uninstall, Codex/Claude usage dashboard, General, Display, Sound, Shortcuts, Lab (advanced), About
 - **Notification mode** — Auto-height notification panel for permission requests and session events
 - **Notification sounds** — Configurable system sounds (default: Bottle) with mute toggle
-- **i18n** — English and Simplified Chinese
+- **i18n** — English, French, Simplified Chinese and Traditional Chinese
 
 ### Session Management
 

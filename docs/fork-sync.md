@@ -25,7 +25,9 @@ judgement on a sync:**
 | `.github/workflows/release.yml`, `.github/workflows/notary-preflight.yml` | delete | Upstream releases from CI; this fork releases locally. A merge will keep resurrecting both — delete them again |
 | `scripts/release.sh` | keep | Fork-only. Upstream has no equivalent, so the merge leaves it alone |
 | `scripts/generate_brand_icons.py` | re-apply | Dead `render_app_icon()` removed — upstream still has it |
-| `.github/workflows/ci.yml` | re-apply | Extra `rebrand.sh --check` guard step |
+| `.github/workflows/ci.yml` | re-apply | Extra `rebrand.sh --check` and `check-localization.py` guard steps |
+| `**/fr.lproj/`, `scripts/check-localization.py` | keep | Fork-only. Upstream ships no French and no key/format-specifier guard |
+| `ios/**` localization | re-apply | Upstream hardcodes Chinese in the iOS/watchOS sources; the fork routes them through `NSLocalizedString` + `PBXVariantGroup` |
 | `scripts/generate-v6-appicon.swift` | re-apply | Fork icon — violet palette *and* fork-only geometry (spectacles in the island) |
 | `Assets/Brand/**` generated output | untrack | Upstream tracks these binaries; this fork gitignores them and regenerates instead |
 | `scripts/rebrand.sh`, `docs/fork-sync.md` | untouched | They *are* the rebrand, and upstream does not have them — the merge leaves them alone |
@@ -73,6 +75,16 @@ test ! -e .github/workflows/release.yml          || echo 'RESURRECTED: CI releas
 test ! -e .github/workflows/notary-preflight.yml || echo 'RESURRECTED: notary preflight is back — delete it'
 test -x scripts/release.sh                       || echo 'MISSING: local release script'
 grep -q 'rebrand.sh --check'          .github/workflows/ci.yml            || echo 'MISSING: rebrand guard step'
+grep -q 'check-localization'          .github/workflows/ci.yml            || echo 'MISSING: localization guard step'
+grep -q 'case fr' Sources/DevIslandApp/Localization/LanguageManager.swift || echo 'MISSING: French in AppLanguage'
+test -d Sources/DevIslandApp/Resources/fr.lproj  || echo 'MISSING: French strings (macOS)'
+test -d ios/DevIslandMobile/fr.lproj             || echo 'MISSING: French strings (iOS)'
+test -d ios/DevIslandWatch/fr.lproj              || echo 'MISSING: French strings (watchOS)'
+# The merge takes upstream's iOS sources wholesale, which reintroduces the hardcoded Chinese.
+# Anchored on a specific call rather than grepping for CJK: the fork's own comments quote
+# Chinese examples on purpose, so a bare character-class grep always false-positives.
+grep -q 'NSLocalizedString' ios/DevIslandMobile/Network/ConnectionManager.swift || echo 'REGRESSED: hardcoded Chinese is back in ios/ — re-apply NSLocalizedString'
+grep -q 'PBXVariantGroup'   ios/DevIslandMobile.xcodeproj/project.pbxproj       || echo 'MISSING: localized resources are no longer declared in the Xcode project'
 grep -q '0xED/255.0'                  scripts/generate-v6-appicon.swift   || echo 'MISSING: fork icon palette'
 grep -q 'lensRadius'                  scripts/generate-v6-appicon.swift   || echo 'MISSING: fork icon geometry (spectacles)'
 grep -q 'app icon is NOT rendered here' scripts/generate_brand_icons.py   || echo 'MISSING: dead render_app_icon() came back'
