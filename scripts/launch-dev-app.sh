@@ -28,6 +28,21 @@ app_binary="$build_root/DevIslandApp"
 hooks_binary="$build_root/DevIslandHooks"
 setup_binary="$build_root/DevIslandSetup"
 
+# The icon generator needs Pillow, which nothing in the repo declares and which the system
+# python3 does not have. scripts/release.sh already solves this by putting .venv ahead of
+# python3 on PATH; this script had no such preflight, so under `set -euo pipefail` a missing
+# Pillow aborted the whole launch before the bundle was ever assembled.
+if ! python3 -c "import PIL" >/dev/null 2>&1; then
+    if [[ -x "$repo_root/.venv/bin/python" ]] && "$repo_root/.venv/bin/python" -c "import PIL" >/dev/null 2>&1; then
+        PATH="$repo_root/.venv/bin:$PATH"
+        export PATH
+    else
+        echo "python3 has no Pillow, and .venv does not provide it either." >&2
+        echo "   python3 -m venv .venv && .venv/bin/pip install Pillow" >&2
+        exit 1
+    fi
+fi
+
 python3 "$brand_script"
 if [ "$skip_setup" = false ]; then
   "$setup_binary" install --hooks-binary "$hooks_binary"
