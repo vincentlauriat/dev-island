@@ -591,7 +591,14 @@ final class AppModel {
         self.terminalJumpAction = terminalJumpAction
         self.isNotificationSessionAlreadyFrontmost = isNotificationSessionAlreadyFrontmost
         UserDefaults.standard.register(defaults: [
-            Self.showDockIconDefaultsKey: true,
+            // Dev Island lives in the notch, not the Dock. It ships no NSStatusItem and no
+            // MenuBarExtra — the island itself is the UI surface, and its panel carries a
+            // settings button — so a Dock icon buys only a second way to reopen Settings, at
+            // the cost of a permanent slot in the user's Dock. The toggle in Settings › General
+            // still turns it back on.
+            // Only affects users who never touched that toggle: an explicit choice is a stored
+            // value, and register(defaults:) never overrides one.
+            Self.showDockIconDefaultsKey: false,
             Self.hapticFeedbackEnabledDefaultsKey: false,
             Self.completionReplyEnabledDefaultsKey: false,
             Self.suppressFrontmostNotificationsDefaultsKey: true,
