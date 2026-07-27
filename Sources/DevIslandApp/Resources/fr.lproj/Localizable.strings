@@ -96,7 +96,8 @@
 "settings.appearance.sessionSort.lastUpdate" = "Dernière mise à jour";
 "settings.appearance.staleThreshold.title" = "06 · Délai après achèvement";
 "settings.appearance.staleThreshold.note" = "Passé ce délai, les sessions terminées basculent vers la présentation inactive, moins prioritaire.";
-"settings.appearance.typography.title" = "07 · Typographie";
+"settings.appearance.typography.part.title" = "Typographie";
+"settings.appearance.typography.title" = "Rôles de texte";
 "settings.appearance.typography.note" = "Taille et graisse du texte des cartes, par rôle. S'applique aussi bien aux cartes d'autorisation, de question que de fin de session.";
 "settings.appearance.typography.reset" = "Rétablir les valeurs par défaut";
 "settings.appearance.typography.role.title" = "Titre";
@@ -106,6 +107,7 @@
 "settings.appearance.typography.sample.title" = "Session terminée";
 "settings.appearance.typography.sample.body" = "Modification de AppModel.swift";
 "settings.appearance.typography.sample.badge" = "claude";
+"settings.appearance.typography.sample.code" = "git commit -m \"fix\"";
 "settings.appearance.typography.weight.regular" = "Normal";
 "settings.appearance.typography.weight.medium" = "Moyen";
 "settings.appearance.typography.weight.semibold" = "Demi-gras";

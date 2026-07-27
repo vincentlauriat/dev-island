@@ -96,7 +96,8 @@
 "settings.appearance.sessionSort.lastUpdate" = "Last update";
 "settings.appearance.staleThreshold.title" = "06 · Done timeout";
 "settings.appearance.staleThreshold.note" = "Completed sessions move to the low-priority idle presentation after this time.";
-"settings.appearance.typography.title" = "07 · Typography";
+"settings.appearance.typography.part.title" = "Typography";
+"settings.appearance.typography.title" = "Text roles";
 "settings.appearance.typography.note" = "Size and weight of card text, by role. Applies to permission, question and completion cards alike.";
 "settings.appearance.typography.reset" = "Reset to defaults";
 "settings.appearance.typography.role.title" = "Title";
@@ -106,6 +107,7 @@
 "settings.appearance.typography.sample.title" = "Session complete";
 "settings.appearance.typography.sample.body" = "Editing AppModel.swift";
 "settings.appearance.typography.sample.badge" = "claude";
+"settings.appearance.typography.sample.code" = "git commit -m \"fix\"";
 "settings.appearance.typography.weight.regular" = "Regular";
 "settings.appearance.typography.weight.medium" = "Medium";
 "settings.appearance.typography.weight.semibold" = "Semibold";

@@ -96,7 +96,8 @@
 "settings.appearance.sessionSort.lastUpdate" = "最近更新";
 "settings.appearance.staleThreshold.title" = "06 · 完成逾時";
 "settings.appearance.staleThreshold.note" = "完成會話經過這段時間後會降到低優先級閒置展示。";
-"settings.appearance.typography.title" = "07 · 字體";
+"settings.appearance.typography.part.title" = "字體";
+"settings.appearance.typography.title" = "文字角色";
 "settings.appearance.typography.note" = "依角色設定卡片文字的字級與字重。同時作用於權限、提問和完成卡片。";
 "settings.appearance.typography.reset" = "恢復預設值";
 "settings.appearance.typography.role.title" = "標題";
@@ -106,6 +107,7 @@
 "settings.appearance.typography.sample.title" = "會話已完成";
 "settings.appearance.typography.sample.body" = "正在編輯 AppModel.swift";
 "settings.appearance.typography.sample.badge" = "claude";
+"settings.appearance.typography.sample.code" = "git commit -m \"fix\"";
 "settings.appearance.typography.weight.regular" = "標準";
 "settings.appearance.typography.weight.medium" = "中等";
 "settings.appearance.typography.weight.semibold" = "半粗";

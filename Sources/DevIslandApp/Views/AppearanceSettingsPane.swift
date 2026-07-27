@@ -32,6 +32,7 @@ struct AppearanceSettingsPane: View {
                 displayProfilePart
                 notchPersonalizationPart
                 sessionListPersonalizationPart
+                typographyPart
             }
             .padding(24)
             .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -140,7 +141,6 @@ struct AppearanceSettingsPane: View {
             sessionGroupSection
             sessionSortSection
             staleThresholdSection
-            typographySection
         }
     }
 
@@ -495,7 +495,21 @@ struct AppearanceSettingsPane: View {
         }
     }
 
-    // MARK: - Typography
+    // MARK: - Typography part
+
+    /// Its own top-level part rather than a section inside the session list.
+    ///
+    /// Everything above reads `editingPreferences` and writes through
+    /// `editingProfile`, so it is scoped by the display-profile switcher at the
+    /// top of the pane. Typography is global — the panel renders identically in
+    /// the notch and on an external display — and nesting it under that switcher
+    /// would show a control that ignores the toggle sitting right above it.
+    private var typographyPart: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            partHeader(title: lang.t("settings.appearance.typography.part.title"))
+            typographySection
+        }
+    }
 
     /// One control pair per text role, plus a live sample.
     ///
@@ -604,9 +618,10 @@ struct AppearanceSettingsPane: View {
         switch role {
         case .title: return lang.t("settings.appearance.typography.sample.title")
         case .body: return lang.t("settings.appearance.typography.sample.body")
-        // Not localized: it is a shell command, and translating it would
-        // misrepresent what the monospaced role actually renders.
-        case .code: return "git commit -m \"fix\""
+        // Same string in every bundle — it is a shell command, and translating
+        // it would misrepresent what the monospaced role renders. It still gets
+        // a key, so the four bundles stay structurally identical.
+        case .code: return lang.t("settings.appearance.typography.sample.code")
         case .badge: return lang.t("settings.appearance.typography.sample.badge")
         }
     }

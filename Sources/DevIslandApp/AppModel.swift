@@ -340,7 +340,11 @@ final class AppModel {
     /// profiles would only ever hold the same answer.
     var islandTypography = IslandTypographyPreferences() {
         didSet {
-            guard islandTypography != oldValue else { return }
+            // `hasFinishedInit` matters here, not just as ceremony: restoring a
+            // stored value during init assigns a non-empty struct, which passes
+            // the inequality check and would otherwise re-persist what was just
+            // read and re-place the overlay before the app has one.
+            guard hasFinishedInit, islandTypography != oldValue else { return }
             Self.persistTypographyPreferences(islandTypography)
             // Text size drives the panel's intrinsic height, so the overlay has
             // to be re-measured — without this the card is clipped or padded
