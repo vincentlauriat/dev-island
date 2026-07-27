@@ -1,0 +1,228 @@
+/* Common */
+"app.name" = "Dev Island";
+"app.name.oss" = "Dev Island OSS";
+"app.description" = "Compagnon macOS pour les agents de code IA";
+
+/* Settings - Tab Labels */
+"settings.tab.general" = "Général";
+"settings.tab.display" = "Affichage";
+"settings.tab.sound" = "Son";
+"settings.tab.shortcuts" = "Raccourcis";
+"settings.tab.lab" = "Labo";
+"settings.tab.about" = "À propos";
+
+/* Settings - Section Headers */
+"settings.section.system" = "Système";
+"settings.section.advanced" = "Avancé";
+
+/* Settings - General */
+"settings.general.launchAtLogin" = "Lancer à l'ouverture de session";
+"settings.general.monitor" = "Écran";
+"settings.general.automatic" = "Automatique";
+"settings.general.behavior" = "Comportement";
+"settings.general.hideFullscreen" = "Masquer en plein écran";
+"settings.general.autoHideNoSessions" = "Masquer automatiquement sans session active";
+"settings.general.autoCollapse" = "Replier quand la souris sort";
+"settings.general.showDockIcon" = "Afficher l'icône dans le Dock";
+"settings.general.hapticFeedback" = "Retour haptique au survol";
+"settings.general.suppressFrontmostNotifications" = "Masquer les notifications des sessions au premier plan";
+"settings.general.showCodexUsage" = "Afficher la consommation Codex";
+"settings.general.completionReply" = "Répondre depuis la carte de fin";
+"settings.general.cliHooks" = "Hooks CLI";
+"settings.general.activated" = "Activés";
+"settings.general.install" = "Installer";
+"settings.general.uninstall" = "Désinstaller";
+"settings.general.uninstallConfirmTitle" = "Désinstaller les hooks ?";
+"settings.general.uninstallConfirmAction" = "Désinstaller";
+"settings.general.uninstallConfirmMessage.claude" = "Les hooks Dev Island vont être retirés de Claude Code. Vous pourrez les réinstaller à tout moment.";
+"settings.general.uninstallConfirmMessage.codex" = "Les hooks Dev Island vont être retirés de Codex. Vous pourrez les réinstaller à tout moment.";
+"settings.general.uninstallConfirmMessage.claudeUsage" = "La passerelle de consommation Claude va être retirée. Vous pourrez la réinstaller à tout moment.";
+"settings.general.cancel" = "Annuler";
+"settings.general.language" = "Langue";
+"settings.general.languageSystem" = "Système";
+"settings.general.languageEnglish" = "Anglais";
+"settings.general.languageFrench" = "Français";
+"settings.general.languageChinese" = "Chinois (simplifié)";
+"settings.general.languageTraditionalChinese" = "Chinois (traditionnel)";
+
+/* Settings - Personalization (v6) */
+"settings.tab.appearance" = "Personnalisation";
+"settings.appearance.preview" = "Aperçu";
+"settings.appearance.preview.external" = "Externe";
+"settings.appearance.preview.macbook" = "MacBook";
+"settings.appearance.state.idle" = "inactif";
+"settings.appearance.state.running" = "en cours";
+"settings.appearance.state.waiting" = "en attente";
+"settings.appearance.state.auto.on" = "auto ✓";
+"settings.appearance.state.auto.off" = "auto";
+"settings.appearance.rightSlot.title" = "01 · Emplacement droit";
+"settings.appearance.rightSlot.note" = "Ce qui s'affiche à droite de l'île repliée.";
+"settings.appearance.rightSlot.count" = "Nombre";
+"settings.appearance.rightSlot.agents" = "Agents";
+"settings.appearance.rightSlot.none" = "Aucun";
+"settings.appearance.centerLabel.title" = "02 · Libellé central";
+"settings.appearance.centerLabel.note" = "Écrans externes uniquement — sur MacBook, l'encoche physique occupe cet espace.";
+"settings.appearance.centerLabel.agentAction" = "Agent · action";
+"settings.appearance.centerLabel.sessionName" = "Nom de la session";
+"settings.appearance.centerLabel.off" = "Désactivé";
+"settings.appearance.notchPart.title" = "Encoche";
+"settings.appearance.sessionListPart.title" = "Liste des sessions";
+"settings.appearance.sessionPreview" = "Aperçu";
+"settings.appearance.profile.title" = "Profil d'affichage";
+"settings.appearance.profile.note" = "Choisissez le type d'écran que vous configurez. Dev Island applique automatiquement le profil correspondant quand la surface change d'écran.";
+"settings.appearance.profile.external.title" = "Écran externe";
+"settings.appearance.profile.external.note" = "Repli sur la barre supérieure, sans les coins d'encoche du MacBook.";
+"settings.appearance.profile.macbook.title" = "Encoche MacBook";
+"settings.appearance.profile.macbook.note" = "Surface d'encoche intégrée, avec une géométrie adaptée.";
+"settings.appearance.usageDisplay.title" = "02 · Consommation";
+"settings.appearance.usageDisplay.note" = "Détermine si l'île ouverte affiche la consommation compacte des agents.";
+"settings.appearance.usageDisplay.hidden" = "Masquée";
+"settings.appearance.usageDisplay.compact" = "Compacte";
+"settings.appearance.stateIndicator.title" = "03 · État des sessions";
+"settings.appearance.stateIndicator.note" = "Comment les lignes signalent les états en cours, en attente et terminé.";
+"settings.appearance.stateIndicator.animatedDot" = "Point animé";
+"settings.appearance.stateIndicator.bar" = "Barre";
+"settings.appearance.stateIndicator.glyph" = "Symbole";
+"settings.appearance.stateIndicator.tint" = "Teinte";
+"settings.appearance.sessionGroup.title" = "04 · Regroupement des sessions";
+"settings.appearance.sessionGroup.note" = "Sections facultatives pour la liste de sessions dépliée.";
+"settings.appearance.sessionGroup.none" = "Aucun";
+"settings.appearance.sessionGroup.state" = "État";
+"settings.appearance.sessionGroup.agent" = "Agent";
+"settings.appearance.sessionGroup.project" = "Projet";
+"settings.appearance.sessionSort.title" = "05 · Tri des sessions";
+"settings.appearance.sessionSort.note" = "Choisissez l'ordre par défaut dans la liste dépliée.";
+"settings.appearance.sessionSort.attention" = "Attention";
+"settings.appearance.sessionSort.lastUpdate" = "Dernière mise à jour";
+"settings.appearance.staleThreshold.title" = "06 · Délai après achèvement";
+"settings.appearance.staleThreshold.note" = "Passé ce délai, les sessions terminées basculent vers la présentation inactive, moins prioritaire.";
+"settings.appearance.staleThreshold.twoMinutes" = "2 min";
+"settings.appearance.staleThreshold.fiveMinutes" = "5 min";
+"settings.appearance.staleThreshold.tenMinutes" = "10 min";
+"settings.appearance.staleThreshold.twentyMinutes" = "20 min";
+"settings.appearance.staleThreshold.never" = "Jamais";
+"settings.appearance.preview.permissionNeeded" = "Autorisation requise";
+"settings.appearance.preview.agentEditing" = "Claude · édition";
+"settings.appearance.preview.approveShellCommand" = "Autoriser la commande shell";
+"settings.appearance.preview.promptImplementPlan" = "Vous : implémente le plan";
+"settings.appearance.preview.waitingForAnswer" = "En attente d'une réponse";
+"settings.appearance.preview.promptChooseNotificationCopy" = "Vous : choisis le texte de la notification";
+"settings.appearance.preview.editingSessionListPreview" = "Modification de l'aperçu de la liste";
+"settings.appearance.preview.promptTightenSettingsUI" = "Vous : resserre l'interface des réglages";
+"settings.appearance.preview.replyAvailable" = "Réponse possible";
+"settings.appearance.preview.promptSummarizeDesignBundle" = "Vous : résume le dossier de design";
+"settings.appearance.preview.completedEarlier" = "Terminée plus tôt";
+"settings.appearance.preview.permissionBody" = "$ npm run build";
+"settings.appearance.preview.pickOrTypeAnswer" = "Choisissez ou saisissez une réponse";
+
+/* Settings - Display */
+"settings.display.monitor" = "Écran";
+"settings.display.position" = "Position d'affichage";
+"settings.display.diagnostics" = "Diagnostics";
+"settings.display.currentScreen" = "Écran actuel";
+"settings.display.layoutMode" = "Mode de disposition";
+
+/* Settings - Sound */
+"settings.sound.notifications" = "Sons de notification";
+"settings.sound.mute" = "Muet";
+"settings.sound.selectSound" = "Choisir un son";
+
+/* Settings - Setup */
+"settings.tab.setup" = "Configuration";
+"setup.section.binary" = "Binaire des hooks";
+"setup.claudeConfigDir.section" = "Dossier de configuration Claude";
+"setup.claudeConfigDir.title" = "Dossier de configuration";
+"setup.claudeConfigDir.choose" = "Choisir…";
+"setup.claudeConfigDir.reset" = "Réinitialiser";
+"setup.claudeConfigDir.footer" = "Pour ceux qui lancent Claude Code avec CLAUDE_CONFIG_DIR. Laissez la valeur par défaut sauf si vous utilisez un chemin de configuration personnalisé.";
+"setup.section.hooks" = "Hooks CLI";
+"setup.section.usage" = "Passerelle de consommation";
+"setup.section.permissions" = "Autorisations";
+"setup.binaryReady" = "Prêt";
+"setup.binaryMissing" = "Introuvable — compilez d'abord DevIslandHooks";
+"setup.hookReady" = "Hooks installés";
+"setup.hookMissing" = "Hooks non installés";
+"setup.usageBridge" = "Passerelle de consommation Claude";
+"setup.usageBridgeReady" = "Installée";
+"setup.usageBridgeDesc" = "Suit localement la consommation de l'API Claude";
+"setup.optional" = "Facultatif";
+"setup.permissionsTitle" = "Accessibilité";
+"setup.permissionsDesc" = "Dev Island peut avoir besoin de l'autorisation Accessibilité pour détecter les fenêtres de terminal. Accordez-la dans Réglages Système → Confidentialité et sécurité → Accessibilité.";
+"setup.installAll" = "Tout installer";
+"setup.banner.noHooks.title" = "Premiers pas avec Dev Island";
+"setup.banner.noHooks.message" = "Installez ci-dessous les hooks des agents que vous utilisez — Dev Island commencera à suivre ces sessions.";
+"setup.revealConfigLocation" = "Afficher la configuration dans le Finder";
+"setup.section.diagnostics" = "Diagnostic des hooks";
+"setup.diagnostics.notRun" = "Contrôle de santé pas encore effectué.";
+"setup.diagnostics.runCheck" = "Lancer le contrôle";
+"setup.diagnostics.recheck" = "Refaire le contrôle";
+"setup.diagnostics.repair" = "Réparer les hooks";
+"setup.diagnostics.allHealthy" = "Tous les hooks sont opérationnels.";
+
+/* Settings - Placeholder */
+"settings.shortcuts.comingSoon" = "Raccourcis clavier bientôt disponibles.";
+"settings.lab.comingSoon" = "Fonctionnalités expérimentales bientôt disponibles.";
+
+/* Settings - About */
+"settings.about.version" = "Version %@";
+"settings.about.checkForUpdates" = "Rechercher les mises à jour…";
+"settings.about.quitApp" = "Quitter Dev Island";
+"island.quit.confirmTitle" = "Quitter Dev Island ?";
+"island.quit.confirmAction" = "Quitter";
+"island.quit.confirmMessage" = "Voulez-vous vraiment quitter ?";
+
+/* Settings - Update */
+"settings.update.available" = "v%@ disponible — Mettre à jour";
+
+/* Island Panel - Bootstrap */
+"island.checkingTerminals" = "Analyse des sessions de terminal ouvertes";
+"island.terminalOwnership" = "Dev Island affichera les agents actifs une fois le terminal identifié";
+"island.noTerminals" = "Aucune session de terminal ouverte";
+"island.startAgent" = "Lancez un agent de code dans votre terminal";
+"island.recentSessions" = "Les sessions récentes restent ici jusqu'à la réouverture du terminal";
+"island.hint.installHooks" = "Aucun hook installé — les sessions ne remonteront aucun événement. Touchez pour configurer.";
+
+/* Island Panel - Session List */
+"island.sessionList.title" = "Sessions";
+"island.sessionOverview.total" = "au total";
+"island.sessionOverview.waiting" = "en attente";
+"island.sessionOverview.waitingCompact" = "att.";
+"island.sessionOverview.running" = "en cours";
+"island.sessionOverview.runningCompact" = "cours";
+"island.sessionOverview.done" = "terminée";
+"island.sessionOverview.idle" = "inactive";
+"island.section.sessions" = "Sessions";
+"island.section.needsApproval" = "À autoriser";
+"island.section.needsAnswer" = "À répondre";
+"island.section.inProgress" = "En cours";
+"island.section.justDone" = "Tout juste terminées";
+"island.section.idle" = "Inactives";
+"island.showAll" = "Afficher les %lld sessions";
+"island.collapseList" = "Replier la liste";
+"island.usageWaiting" = "Consommation en attente";
+
+/* Island Panel - Approval */
+"approval.toolPermissionRequested" = "Autorisation d'outil demandée";
+"approval.deny" = "Non";
+"approval.allowOnce" = "Oui";
+"approval.alwaysAllow" = "Toujours autoriser (%@)";
+
+
+/* Island Panel - Subagents & Tasks */
+"subagents.title" = "Sous-agents (%lld)";
+"subagents.completed" = "Terminé";
+"tasks.summary" = "Tâches (%lld terminées, %lld en cours, %lld en attente)";
+
+/* Island Panel - Question */
+"question.submit" = "Envoyer les réponses";
+"question.answerNeeded" = "Réponse requise";
+"question.otherPlaceholder" = "Saisissez votre réponse…";
+"question.sendReply" = "Envoyer la réponse";
+"question.sendAnswer" = "Envoyer la réponse";
+
+/* Island Panel - Completion */
+"completion.done" = "Terminé";
+"completion.replyPlaceholder" = "Répondre à %@…";
+
+/* Window Titles */
+"window.settings" = "Réglages Dev Island";

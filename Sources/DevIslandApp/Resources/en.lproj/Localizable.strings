@@ -41,6 +41,7 @@
 "settings.general.language" = "Language";
 "settings.general.languageSystem" = "System";
 "settings.general.languageEnglish" = "English";
+"settings.general.languageFrench" = "French";
 "settings.general.languageChinese" = "Chinese (Simplified)";
 "settings.general.languageTraditionalChinese" = "Chinese (Traditional)";
 

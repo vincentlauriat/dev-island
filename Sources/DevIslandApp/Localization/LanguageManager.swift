@@ -13,6 +13,7 @@ final class LanguageManager: @unchecked Sendable {
     enum AppLanguage: String, CaseIterable, Identifiable, Codable {
         case system
         case en
+        case fr
         case zhHans = "zh-Hans"
         case zhHant = "zh-Hant"
 
@@ -27,9 +28,13 @@ final class LanguageManager: @unchecked Sendable {
                     return "zh-Hant"
                 }
                 if preferred.hasPrefix("zh") { return "zh-Hans" }
+                // Matches "fr", "fr-FR", "fr-CA", "fr-BE"… all of which ship the same bundle.
+                if preferred.hasPrefix("fr") { return "fr" }
                 return "en"
             case .en:
                 return "en"
+            case .fr:
+                return "fr"
             case .zhHans:
                 return "zh-Hans"
             case .zhHant:
