@@ -335,6 +335,24 @@ final class AppModel {
         }
     }
 
+    /// Card typography. Global rather than per display profile: the panel is
+    /// laid out identically in the notch and on an external display, so the two
+    /// profiles would only ever hold the same answer.
+    var islandTypography = IslandTypographyPreferences() {
+        didSet {
+            // `hasFinishedInit` matters here, not just as ceremony: restoring a
+            // stored value during init assigns a non-empty struct, which passes
+            // the inequality check and would otherwise re-persist what was just
+            // read and re-place the overlay before the app has one.
+            guard hasFinishedInit, islandTypography != oldValue else { return }
+            Self.persistTypographyPreferences(islandTypography)
+            // Text size drives the panel's intrinsic height, so the overlay has
+            // to be re-measured — without this the card is clipped or padded
+            // until something else forces a placement pass.
+            refreshOverlayPlacementIfVisible()
+        }
+    }
+
     /// Runtime profile selected from current overlay placement. External
     /// displays use the top-bar presentation; built-in notch displays keep
     /// notch-aware geometry and their own persisted appearance choices.
@@ -540,6 +558,54 @@ final class AppModel {
         "appearance.island.v8.\(profile.rawValue).\(name)"
     }
 
+    private static func typographyDefaultsKey(_ role: IslandTextRole, _ name: String) -> String {
+        "appearance.typography.v1.\(role.rawValue).\(name)"
+    }
+
+    /// Only roles the user actually moved are written back. Storing every role
+    /// unconditionally would freeze today's defaults into every install, so a
+    /// later change to a default size would never reach anyone who had merely
+    /// opened the settings pane once.
+    private static func persistTypographyPreferences(_ preferences: IslandTypographyPreferences) {
+        let defaults = UserDefaults.standard
+        for role in IslandTextRole.allCases {
+            let sizeKey = typographyDefaultsKey(role, "size")
+            if let size = preferences.sizes[role] {
+                defaults.set(size, forKey: sizeKey)
+            } else {
+                defaults.removeObject(forKey: sizeKey)
+            }
+
+            let weightKey = typographyDefaultsKey(role, "weight")
+            if let weight = preferences.weights[role] {
+                defaults.set(weight.rawValue, forKey: weightKey)
+            } else {
+                defaults.removeObject(forKey: weightKey)
+            }
+        }
+    }
+
+    private static func loadTypographyPreferences() -> IslandTypographyPreferences {
+        let defaults = UserDefaults.standard
+        var preferences = IslandTypographyPreferences()
+        for role in IslandTextRole.allCases {
+            // `object(forKey:)` rather than `double(forKey:)`: the latter cannot
+            // tell an absent key from a stored 0, and a stored 0 would clamp to
+            // an unreadable font instead of falling back to the default.
+            if defaults.object(forKey: typographyDefaultsKey(role, "size")) != nil {
+                let stored = defaults.double(forKey: typographyDefaultsKey(role, "size"))
+                if role.sizeRange.contains(stored) {
+                    preferences.sizes[role] = stored
+                }
+            }
+            if let raw = defaults.string(forKey: typographyDefaultsKey(role, "weight")),
+               let weight = IslandFontWeight(rawValue: raw) {
+                preferences.weights[role] = weight
+            }
+        }
+        return preferences
+    }
+
     private static func loadAppearancePreferences(for profile: IslandAppearanceDisplayProfile) -> IslandAppearancePreferences {
         let defaults = UserDefaults.standard
         return IslandAppearancePreferences(
@@ -622,6 +688,7 @@ final class AppModel {
         ) ?? .topBar
         notchAppearancePreferences = Self.loadAppearancePreferences(for: .notch)
         topBarAppearancePreferences = Self.loadAppearancePreferences(for: .topBar)
+        islandTypography = Self.loadTypographyPreferences()
         watchNotificationEnabled = UserDefaults.standard.bool(forKey: Self.watchNotificationEnabledKey)
         if watchNotificationEnabled {
             startWatchRelay()

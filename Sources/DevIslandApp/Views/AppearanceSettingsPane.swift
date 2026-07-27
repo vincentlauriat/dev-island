@@ -32,6 +32,7 @@ struct AppearanceSettingsPane: View {
                 displayProfilePart
                 notchPersonalizationPart
                 sessionListPersonalizationPart
+                typographyPart
             }
             .padding(24)
             .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -491,6 +492,146 @@ struct AppearanceSettingsPane: View {
                         .foregroundStyle(V6Palette.paper.opacity(0.9))
                 }
             }
+        }
+    }
+
+    // MARK: - Typography part
+
+    /// Its own top-level part rather than a section inside the session list.
+    ///
+    /// Everything above reads `editingPreferences` and writes through
+    /// `editingProfile`, so it is scoped by the display-profile switcher at the
+    /// top of the pane. Typography is global — the panel renders identically in
+    /// the notch and on an external display — and nesting it under that switcher
+    /// would show a control that ignores the toggle sitting right above it.
+    private var typographyPart: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            partHeader(title: lang.t("settings.appearance.typography.part.title"))
+            typographySection
+        }
+    }
+
+    /// One control pair per text role, plus a live sample.
+    ///
+    /// Roles rather than event types: the permission, question and completion
+    /// cards are one component, so a per-type setting would have reached only
+    /// their action buttons. See `IslandTextRole`.
+    @ViewBuilder
+    private var typographySection: some View {
+        sectionHeader(
+            title: lang.t("settings.appearance.typography.title"),
+            note: lang.t("settings.appearance.typography.note")
+        )
+
+        VStack(alignment: .leading, spacing: 14) {
+            ForEach(IslandTextRole.allCases) { role in
+                typographyRow(role)
+            }
+
+            HStack {
+                Spacer(minLength: 0)
+                Button(lang.t("settings.appearance.typography.reset")) {
+                    model.islandTypography = IslandTypographyPreferences()
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.white.opacity(0.7))
+                .font(.system(size: 11.5, weight: .medium))
+                .disabled(model.islandTypography.isDefault)
+                .opacity(model.islandTypography.isDefault ? 0.35 : 1)
+            }
+        }
+    }
+
+    private func typographyRow(_ role: IslandTextRole) -> some View {
+        let typography = model.islandTypography
+        let size = typography.size(role)
+
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Text(typographyRoleTitle(role))
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.9))
+
+                Spacer(minLength: 0)
+
+                // The sample uses the role's own font, so the row previews the
+                // setting it carries without needing a separate preview stage.
+                Text(typographyRoleSample(role))
+                    .font(typography.font(role))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .lineLimit(1)
+            }
+
+            HStack(spacing: 12) {
+                Slider(
+                    value: Binding(
+                        get: { size },
+                        set: { newValue in
+                            // Quantised to 0.5 pt: the island is small enough
+                            // that finer steps are invisible, and a slider that
+                            // lands on 11.34 pt makes the readout look broken.
+                            var updated = model.islandTypography
+                            updated.sizes[role] = (newValue * 2).rounded() / 2
+                            model.islandTypography = updated
+                        }
+                    ),
+                    in: role.sizeRange
+                )
+                .controlSize(.small)
+
+                Text(String(format: "%.1f pt", size))
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .frame(width: 52, alignment: .trailing)
+
+                Picker(
+                    "",
+                    selection: Binding(
+                        get: { typography.weight(role) },
+                        set: { newValue in
+                            var updated = model.islandTypography
+                            updated.weights[role] = newValue
+                            model.islandTypography = updated
+                        }
+                    )
+                ) {
+                    ForEach(IslandFontWeight.allCases) { weight in
+                        Text(typographyWeightTitle(weight)).tag(weight)
+                    }
+                }
+                .labelsHidden()
+                .frame(width: 110)
+            }
+        }
+    }
+
+    private func typographyRoleTitle(_ role: IslandTextRole) -> String {
+        switch role {
+        case .title: return lang.t("settings.appearance.typography.role.title")
+        case .body: return lang.t("settings.appearance.typography.role.body")
+        case .code: return lang.t("settings.appearance.typography.role.code")
+        case .badge: return lang.t("settings.appearance.typography.role.badge")
+        }
+    }
+
+    private func typographyRoleSample(_ role: IslandTextRole) -> String {
+        switch role {
+        case .title: return lang.t("settings.appearance.typography.sample.title")
+        case .body: return lang.t("settings.appearance.typography.sample.body")
+        // Same string in every bundle — it is a shell command, and translating
+        // it would misrepresent what the monospaced role renders. It still gets
+        // a key, so the four bundles stay structurally identical.
+        case .code: return lang.t("settings.appearance.typography.sample.code")
+        case .badge: return lang.t("settings.appearance.typography.sample.badge")
+        }
+    }
+
+    private func typographyWeightTitle(_ weight: IslandFontWeight) -> String {
+        switch weight {
+        case .regular: return lang.t("settings.appearance.typography.weight.regular")
+        case .medium: return lang.t("settings.appearance.typography.weight.medium")
+        case .semibold: return lang.t("settings.appearance.typography.weight.semibold")
+        case .bold: return lang.t("settings.appearance.typography.weight.bold")
         }
     }
 
