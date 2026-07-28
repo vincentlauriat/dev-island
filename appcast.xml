@@ -16,6 +16,19 @@
         -->
         <!-- Items are added by the release workflow. See docs/releasing.md. -->
         <item>
+            <title>Version 1.1.0</title>
+            <sparkle:version>1012</sparkle:version>
+            <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <pubDate>Tue, 28 Jul 2026 06:18:53 +0000</pubDate>
+            <enclosure
+                url="https://github.com/vincentlauriat/dev-island/releases/download/v1.1.0/Dev.Island.zip"
+                type="application/octet-stream"
+                sparkle:edSignature="a2fgBHvwGh6TjhIc3h7HmrVbJqoDyTVHDypy24DLSUfedabMwKzNzybXhGgOGhijFopuiXK8uO29P5PYMU4LDQ=="
+                length="12686654"
+            />
+        </item>
+        <item>
             <title>Version 1.0.0</title>
             <sparkle:version>988</sparkle:version>
             <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>

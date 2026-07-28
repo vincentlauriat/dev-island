@@ -20,7 +20,11 @@ VERSION="$1"
 BUILD_NUMBER="$2"
 ED_SIGNATURE="$3"
 LENGTH="$4"
-PUB_DATE="${5:-$(date -u '+%a, %d %b %Y %H:%M:%S +0000')}"
+# LC_TIME=C is load-bearing: %a and %b are locale-dependent, and RSS pubDate is
+# RFC 822, which allows only the English abbreviations. On this French-locale
+# shell the default produced "mar., 28 juil. 2026 ...", which is not a valid
+# RFC 822 date. v1.0.0 escaped it only because that build ran under a C locale.
+PUB_DATE="${5:-$(LC_TIME=C date -u '+%a, %d %b %Y %H:%M:%S +0000')}"
 
 repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 appcast="$repo_root/appcast.xml"
@@ -64,6 +68,19 @@ with open(appcast_path, "r") as f:
 marker = "<!-- Items are added by the release workflow. See docs/releasing.md. -->"
 if marker not in content:
     print("Error: marker comment not found in appcast.xml", file=sys.stderr)
+    sys.exit(1)
+
+# Insertion is unconditional, so re-running a release for a version already in
+# the feed would leave two <item>s claiming the same version with different
+# signatures — Sparkle would pick one of them, and which one is not something
+# this script gets to decide. Refuse instead, and say how to proceed.
+if f"<sparkle:shortVersionString>{version}</sparkle:shortVersionString>" in content:
+    print(
+        f"Error: appcast.xml already has an entry for {version}.\n"
+        f"       Re-running a release for the same version would create a duplicate.\n"
+        f"       Remove the existing <item> for {version} first, then re-run.",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 content = content.replace(marker, marker + "\n" + new_item)

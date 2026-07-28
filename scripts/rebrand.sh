@@ -49,6 +49,7 @@ sed_script='
 s|Octane0411/open-vibe-island|vincentlauriat/dev-island|g
 s|open-vibe-island|dev-island|g
 s|OPEN_ISLAND|DEV_ISLAND|g
+s|OPEN ISLAND|DEV ISLAND|g
 s|OpenIsland|DevIsland|g
 s|Open Island|Dev Island|g
 s|Open\\ Island|Dev\\ Island|g
@@ -65,7 +66,7 @@ s|open-island|dev-island|g
 #                     a download URL from this, so missing it yields a feed pointing at a file
 #                     that does not exist.
 
-branding_regex='OpenIsland|Open Island|Open\\ Island|Open\.Island|open\.island|openisland|open-island|OPEN_ISLAND|open-vibe-island'
+branding_regex='OpenIsland|Open Island|Open\\ Island|Open\.Island|open\.island|openisland|open-island|OPEN_ISLAND|OPEN ISLAND|open-vibe-island'
 
 rename_path() {
     printf '%s' "$1" | sed -e 's|OpenIsland|DevIsland|g' -e 's|open-island|dev-island|g'
