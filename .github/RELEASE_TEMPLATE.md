@@ -33,7 +33,11 @@ Bref résumé de cette version.
 
   This template used to carry `brew install --cask octane0411/tap/devisland`,
   inherited from upstream. That tap is upstream's: installing from it hands the
-  reader Open Island — a different app — under a Dev Island release note.
+  reader upstream's app — a different product — under a Dev Island release note.
+
+  Upstream's product name is deliberately not spelled out: rebrand.sh --check
+  flags that literal anywhere in the tree and cannot tell a deliberate mention
+  from a missed rename.
 
   This fork ships no cask. Add a section here only once one exists in a tap this
   account owns, and never point at upstream's.

@@ -70,6 +70,19 @@ if marker not in content:
     print("Error: marker comment not found in appcast.xml", file=sys.stderr)
     sys.exit(1)
 
+# Insertion is unconditional, so re-running a release for a version already in
+# the feed would leave two <item>s claiming the same version with different
+# signatures — Sparkle would pick one of them, and which one is not something
+# this script gets to decide. Refuse instead, and say how to proceed.
+if f"<sparkle:shortVersionString>{version}</sparkle:shortVersionString>" in content:
+    print(
+        f"Error: appcast.xml already has an entry for {version}.\n"
+        f"       Re-running a release for the same version would create a duplicate.\n"
+        f"       Remove the existing <item> for {version} first, then re-run.",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
 content = content.replace(marker, marker + "\n" + new_item)
 
 with open(appcast_path, "w") as f:

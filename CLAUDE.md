@@ -66,7 +66,7 @@ The project is past MVP and welcomes new ideas and creative directions, but the 
 - Before tagging: `git fetch origin main` and review every merged PR since the last tag. Don't trust memory.
 - Trilingual required (English + Français + 简体中文) — the app ships all three, so notes in only two of them can end up not covering the language the release is announcing. Template: `.github/RELEASE_TEMPLATE.md`. Entry format: `- **Category**: English (#PR)\n  Français (#PR)\n  中文 (#PR)`. External contributors get `— Thanks @user` on the English line.
 - Title: `Dev Island vX.Y.Z — Short English Title`. Installation section trilingual.
-- **No Homebrew section** until a cask exists in a tap this account owns. The inherited template pointed at upstream's tap (`octane0411/tap/devisland`), which installs Open Island — a different app — under a Dev Island release note.
+- **No Homebrew section** until a cask exists in a tap this account owns. The inherited template pointed at upstream's tap (`octane0411/tap/devisland`), which installs *upstream's app* — a different product — under a Dev Island release note. (Upstream's product name is deliberately not spelled out here: `scripts/rebrand.sh --check` flags that literal anywhere in the tree, and cannot tell a deliberate reference from a missed rename.)
 
 ## Conventions
 
