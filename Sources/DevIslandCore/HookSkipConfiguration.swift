@@ -5,7 +5,7 @@ import Foundation
 public enum HookSkipConfiguration {
     /// Preferred Dev Island environment key for disabling hooks in this process.
     /// Dev Island 推荐使用的当前进程 hook 跳过开关。
-    public static let openIslandSkipKey = "DEV_ISLAND_SKIP_HOOKS"
+    public static let devIslandSkipKey = "DEV_ISLAND_SKIP_HOOKS"
     /// Compatibility alias used by existing Vibe Island integrations.
     /// 兼容已有 Vibe Island 集成使用的旧开关。
     public static let legacyVibeIslandSkipKey = "VIBE_ISLAND_SKIP"
@@ -13,7 +13,7 @@ public enum HookSkipConfiguration {
     /// Returns true when the provided environment explicitly requests hook no-op mode.
     /// 当传入环境显式要求跳过 hook 时返回 true。
     public static func shouldSkipHooks(environment: [String: String]) -> Bool {
-        isTruthy(environment[openIslandSkipKey])
+        isTruthy(environment[devIslandSkipKey])
             || isTruthy(environment[legacyVibeIslandSkipKey])
     }
 

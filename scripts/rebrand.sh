@@ -46,18 +46,37 @@ is_excluded() {
 # Not matched on purpose: `OpenCode`, `com.openai.*`, and `VIBE_ISLAND_SOCKET_PATH` (a legacy
 # compatibility env var inherited from upstream).
 sed_script='
+s|_openIslandOriginalStatusLine|@@KEEP_STATUSLINE_LITERAL@@|g
+s|openIslandOriginalStatusLineKey|@@KEEP_STATUSLINE_SYMBOL@@|g
 s|Octane0411/open-vibe-island|vincentlauriat/dev-island|g
 s|open-vibe-island|dev-island|g
 s|OPEN_ISLAND|DEV_ISLAND|g
 s|OPEN ISLAND|DEV ISLAND|g
 s|OpenIsland|DevIsland|g
+s|openIsland|devIsland|g
 s|Open Island|Dev Island|g
 s|Open\\ Island|Dev\\ Island|g
 s|Open\.Island|Dev.Island|g
 s|open\.island|dev.island|g
 s|openisland|devisland|g
 s|open-island|dev-island|g
+s|@@KEEP_STATUSLINE_LITERAL@@|_openIslandOriginalStatusLine|g
+s|@@KEEP_STATUSLINE_SYMBOL@@|openIslandOriginalStatusLineKey|g
 '
+
+# The two sentinel round-trips are a deliberate carve-out, not an oversight.
+#
+# `_openIslandOriginalStatusLine` is the key this app writes into the user's
+# ~/.claude/settings.json to stash their original statusLine, and reads back on uninstall to
+# restore it. That is an on-disk contract with every existing install, not an internal name:
+# renaming it would make uninstall() miss the key on any machine set up with v1.0.0 or v1.1.0,
+# fall through to the branch that deletes "statusLine" outright, and silently destroy the
+# user's own configuration.
+#
+# Renaming it needs a migration (read both keys), not a substitution. Until someone writes
+# that, the literal and its Swift symbol are protected here so the rules can cover `openIsland`
+# everywhere else. A whole-file exclusion would have been blunter — it would also hide any
+# genuine branding leak that lands in that file later.
 
 # The two escaped spellings above are easy to miss and both are load-bearing:
 #   `Open\ Island`  — shell-escaped paths, e.g. ~/Applications/Open\ Island\ Dev.app
@@ -66,7 +85,19 @@ s|open-island|dev-island|g
 #                     a download URL from this, so missing it yields a feed pointing at a file
 #                     that does not exist.
 
-branding_regex='OpenIsland|Open Island|Open\\ Island|Open\.Island|open\.island|openisland|open-island|OPEN_ISLAND|OPEN ISLAND|open-vibe-island'
+# There is deliberately no second list of patterns here.
+#
+# Pass 2 used to pre-filter files with a `branding_regex` that restated the rules above. Keeping
+# two lists in step is exactly the failure this fork already shipped: `OPEN ISLAND` (uppercase,
+# space) was missing from *both* at once, so `--check` reported clean while the DMG background
+# carried upstream's name into a published release. `openIsland` was missing the same way.
+#
+# The check now asks the only question that matters — "would the substitution change this
+# file?" — by running the substitution and comparing. It cannot drift from the rules, because
+# it *is* the rules.
+would_rewrite() {
+    ! sed "$sed_script" "$1" 2>/dev/null | cmp -s - "$1"
+}
 
 rename_path() {
     printf '%s' "$1" | sed -e 's|OpenIsland|DevIsland|g' -e 's|open-island|dev-island|g'
@@ -101,9 +132,10 @@ fi
 rewritten=0
 while IFS= read -r -d '' path; do
     is_excluded "$path" && continue
-    # `grep -I` reports no match for a binary file, so this both skips binaries and skips
-    # text files that carry no branding.
-    grep -Iq -E "$branding_regex" "$path" 2>/dev/null || continue
+    # `grep -I` reports no match for a binary file, so an empty pattern matches every text
+    # file and nothing else. Binaries must never reach sed -i.
+    grep -Iq '' "$path" 2>/dev/null || continue
+    would_rewrite "$path" || continue
 
     if [ "$check_only" -eq 1 ]; then
         echo "would rewrite: $path"
