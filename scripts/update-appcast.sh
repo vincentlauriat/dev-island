@@ -20,7 +20,11 @@ VERSION="$1"
 BUILD_NUMBER="$2"
 ED_SIGNATURE="$3"
 LENGTH="$4"
-PUB_DATE="${5:-$(date -u '+%a, %d %b %Y %H:%M:%S +0000')}"
+# LC_TIME=C is load-bearing: %a and %b are locale-dependent, and RSS pubDate is
+# RFC 822, which allows only the English abbreviations. On this French-locale
+# shell the default produced "mar., 28 juil. 2026 ...", which is not a valid
+# RFC 822 date. v1.0.0 escaped it only because that build ran under a C locale.
+PUB_DATE="${5:-$(LC_TIME=C date -u '+%a, %d %b %Y %H:%M:%S +0000')}"
 
 repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 appcast="$repo_root/appcast.xml"
