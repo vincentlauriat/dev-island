@@ -39,6 +39,11 @@ This index is the repository map for humans and coding agents. Read these files 
 
 - [docs/session-state-refactor.md](./session-state-refactor.md) for the session state management refactoring plan (process discovery as source of truth)
 
+## Agent Monitoring
+
+- [docs/agent-monitoring-prd.md](./agent-monitoring-prd.md) for the retained agent execution history feature (problem, gap analysis vs. Agent Flow, phasing)
+- [docs/agent-monitoring-architecture.md](./agent-monitoring-architecture.md) for how Agent Flow works, how its event/graph model maps onto Dev Island, and the implementation slices
+
 ## Watch / iOS
 
 - [docs/watch-notification-design.md](./watch-notification-design.md) for the Apple Watch notification design document
