@@ -7,10 +7,10 @@ struct HookSkipConfigurationTests {
     /// Accepts common truthy spellings for the preferred Dev Island key.
     /// 推荐的新环境变量接受常见真值写法。
     @Test
-    func openIslandSkipHooksAcceptsTruthyValues() {
+    func devIslandSkipHooksAcceptsTruthyValues() {
         for value in ["1", "true", "TRUE", "yes", "on", " 1 "] {
             #expect(HookSkipConfiguration.shouldSkipHooks(environment: [
-                HookSkipConfiguration.openIslandSkipKey: value,
+                HookSkipConfiguration.devIslandSkipKey: value,
             ]))
         }
     }
@@ -30,7 +30,7 @@ struct HookSkipConfigurationTests {
     func skipHooksRejectsFalsyOrMissingValues() {
         for value in ["", "0", "false", "no", "off", "random"] {
             #expect(!HookSkipConfiguration.shouldSkipHooks(environment: [
-                HookSkipConfiguration.openIslandSkipKey: value,
+                HookSkipConfiguration.devIslandSkipKey: value,
             ]))
         }
 

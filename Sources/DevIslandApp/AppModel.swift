@@ -9,7 +9,7 @@ extension Notification.Name {
     /// switch to the Setup tab. Lets the empty-state CTAs deliver the
     /// user to the right place without `SettingsView`'s `@State` having
     /// to leak into `AppModel`.
-    static let openIslandSelectSetupTab = Notification.Name("openIslandSelectSetupTab")
+    static let devIslandSelectSetupTab = Notification.Name("devIslandSelectSetupTab")
 }
 
 @MainActor
@@ -1350,7 +1350,7 @@ final class AppModel {
     /// later PR; until then this is the canonical entry point.
     func showOnboarding() {
         showSettings()
-        NotificationCenter.default.post(name: .openIslandSelectSetupTab, object: nil)
+        NotificationCenter.default.post(name: .devIslandSelectSetupTab, object: nil)
     }
 
     func toggleSoundMuted() {
