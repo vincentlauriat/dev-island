@@ -2,6 +2,20 @@
 
 set -euo pipefail
 
+# Notary credentials: an App Store Connect API key (.p8) when NOTARY_KEY_ID, NOTARY_ISSUER_ID and
+# NOTARY_KEY_PATH are set or read from ~/.config/notarytool/api-key.env (it survives a keychain
+# reset); otherwise the keychain profile given as first argument. Usage: notary_run <profile> <args>
+notary_run() {
+  _np="$1"; shift
+  _nf="${NOTARY_ENV_FILE:-$HOME/.config/notarytool/api-key.env}"
+  if [ -z "${NOTARY_KEY_ID:-}" ] && [ -f "$_nf" ]; then . "$_nf"; fi
+  if [ -n "${NOTARY_KEY_ID:-}" ]; then
+    xcrun notarytool "$@" --key "${NOTARY_KEY_PATH/#\~/$HOME}" --key-id "$NOTARY_KEY_ID" --issuer "${NOTARY_ISSUER_ID:-}"
+  else
+    xcrun notarytool "$@" --keychain-profile "$_np"
+  fi
+}
+
 if [[ "$(uname -s)" != "Darwin" ]]; then
     echo "Dev Island packaging runs only on macOS." >&2
     exit 1
@@ -231,7 +245,7 @@ ditto -c -k --keepParent "$bundle_dir" "$zip_path"
 
 # --- Notarize app bundle (before DMG so the stapled bundle goes into the DMG) ---
 if [[ -n "$signing_identity" && -n "$notary_profile" ]]; then
-    xcrun notarytool submit "$zip_path" --keychain-profile "$notary_profile" --wait
+    notary_run "$notary_profile" submit "$zip_path" --wait
     xcrun stapler staple -v "$bundle_dir"
     rm -f "$zip_path"
     ditto -c -k --keepParent "$bundle_dir" "$zip_path"
@@ -265,7 +279,7 @@ fi
 
 # Notarize and staple the DMG
 if [[ -n "$signing_identity" && -n "$notary_profile" ]]; then
-    xcrun notarytool submit "$dmg_path" --keychain-profile "$notary_profile" --wait
+    notary_run "$notary_profile" submit "$dmg_path" --wait
     xcrun stapler staple -v "$dmg_path"
 fi
 
