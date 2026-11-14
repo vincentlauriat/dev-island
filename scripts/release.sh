@@ -42,6 +42,20 @@
 
 set -euo pipefail
 
+# Notary credentials: an App Store Connect API key (.p8) when NOTARY_KEY_ID, NOTARY_ISSUER_ID and
+# NOTARY_KEY_PATH are set or read from ~/.config/notarytool/api-key.env (it survives a keychain
+# reset); otherwise the keychain profile given as first argument. Usage: notary_run <profile> <args>
+notary_run() {
+  _np="$1"; shift
+  _nf="${NOTARY_ENV_FILE:-$HOME/.config/notarytool/api-key.env}"
+  if [ -z "${NOTARY_KEY_ID:-}" ] && [ -f "$_nf" ]; then . "$_nf"; fi
+  if [ -n "${NOTARY_KEY_ID:-}" ]; then
+    xcrun notarytool "$@" --key "${NOTARY_KEY_PATH/#\~/$HOME}" --key-id "$NOTARY_KEY_ID" --issuer "${NOTARY_ISSUER_ID:-}"
+  else
+    xcrun notarytool "$@" --keychain-profile "$_np"
+  fi
+}
+
 VERSION="${1:?Usage: zsh scripts/release.sh <version>   (e.g. zsh scripts/release.sh 1.0.0)}"
 
 repo_root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -109,7 +123,7 @@ security find-identity -v -p codesigning 2>/dev/null | grep -qF "$SIGNING_IDENTI
     || die "Signing identity not found in the keychain: $SIGNING_IDENTITY"
 
 step "Checking the notarization profile"
-xcrun notarytool history --keychain-profile "$NOTARY_PROFILE" >/dev/null 2>&1 \
+notary_run "$NOTARY_PROFILE" history >/dev/null 2>&1 \
     || die "Notary profile '$NOTARY_PROFILE' is missing or its credentials are stale.
    Recreate it with:
      xcrun notarytool store-credentials \"$NOTARY_PROFILE\" --apple-id <apple-id> --team-id KFLACS69T9"
